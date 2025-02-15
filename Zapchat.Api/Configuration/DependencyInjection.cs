@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Connections;
-using Microsoft.Extensions.Options;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
+﻿using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using FluentValidation;
 using Zapchat.Domain.DTOs;
@@ -11,6 +9,10 @@ using Zapchat.Service.Services.ContasPagar;
 using Zapchat.Service.Services;
 using Zapchat.Service.Validations;
 using static Zapchat.Api.Configuration.SwagguerConfig;
+using Zapchat.Domain.Interfaces.Clientes;
+using Zapchat.Service.Services.Clientes;
+using Zapchat.Domain.Interfaces.Messages;
+using Zapchat.Domain.Notifications;
 
 namespace Zapchat.Api.Configuration
 {
@@ -19,17 +21,18 @@ namespace Zapchat.Api.Configuration
         public static IServiceCollection ResolveDependencies(this IServiceCollection services)
         {
             services.AddHttpClient();
+            services.AddScoped<INotificator, Notificator>();
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
             services.AddScoped<IGrupoWhatsAppRepository, GrupoWhatsAppRepository>();
             services.AddScoped<IUsuarioService, UsuarioService>();
             services.AddScoped<IGrupoWhatsAppService, GrupoWhatsAppService>();
             services.AddScoped<IValidator<UsuarioDto>, UsuarioValidator>();
             services.AddScoped<IContasPagarService, ContasPagarService>();
+            services.AddScoped<IClientesService, ClientesService>();
+            services.AddScoped<IUtilsService, UtilsService>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-
-            services.AddHttpClient<IContasPagarService, ContasPagarService>();
 
             return services;
         }

@@ -767,7 +767,7 @@
       "Zapchat.Domain/1.0.0": {
         "runtime": {
           "Zapchat.Domain.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -784,7 +784,7 @@
         },
         "runtime": {
           "Zapchat.Repository.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -800,7 +800,7 @@
         },
         "runtime": {
           "Zapchat.Service.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }

@@ -21,3 +21,15 @@ E:\dev\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\Zapchat.Domain.dll
 E:\dev\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\refint\Zapchat.Domain.dll
 E:\dev\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\Zapchat.Domain.pdb
 E:\dev\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\ref\Zapchat.Domain.dll
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\bin\Debug\net7.0\Zapchat.Domain.deps.json
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\bin\Debug\net7.0\Zapchat.Domain.dll
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\bin\Debug\net7.0\Zapchat.Domain.pdb
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\Zapchat.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\Zapchat.Domain.AssemblyInfoInputs.cache
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\Zapchat.Domain.AssemblyInfo.cs
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\Zapchat.Domain.csproj.CoreCompileInputs.cache
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\Zapchat.Domain.sourcelink.json
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\Zapchat.Domain.dll
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\refint\Zapchat.Domain.dll
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\Zapchat.Domain.pdb
+C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Domain\obj\Debug\net7.0\ref\Zapchat.Domain.dll

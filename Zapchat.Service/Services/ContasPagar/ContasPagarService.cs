@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using System.Net.Http;
@@ -198,8 +199,8 @@ namespace Zapchat.Service.Services.ContasPagar
 
                 worksheet.Cell(row, 1).Value = conta.CodigoLancamentoOmie;
                 worksheet.Cell(row, 2).Value = conta.CodigoClienteFornecedor;
-                worksheet.Cell(row, 3).Value = Convert.ToDateTime(conta.DataEmissao).ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 4).Value = Convert.ToDateTime(conta.DataVencimento).ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataEmissao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                worksheet.Cell(row, 4).Value = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 worksheet.Cell(row, 5).Value = conta.StatusTitulo;
                 worksheet.Cell(row, 6).Value = conta.ValorDocumento.ToString(CultureInfo.InvariantCulture);
                 worksheet.Cell(row, 7).Value = !string.IsNullOrEmpty(fornecedor.RazaoSocial) ? fornecedor.RazaoSocial : "Razão Social não encontrada";

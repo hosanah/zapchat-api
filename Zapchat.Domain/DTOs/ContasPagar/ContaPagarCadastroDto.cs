@@ -31,16 +31,16 @@ namespace Zapchat.Domain.DTOs.ContasPagar
         public string? CodigoTipoDocumento { get; set; }
 
         [JsonPropertyName("data_emissao")]
-        public string? DataEmissao { get; set; }
+        public string DataEmissao { get; set; } = string.Empty;
 
         [JsonPropertyName("data_entrada")]
-        public string? DataEntrada { get; set; }
+        public string DataEntrada { get; set; } = string.Empty;
 
         [JsonPropertyName("data_previsao")]
-        public string? DataPrevisao { get; set; }
+        public string DataPrevisao { get; set; } = string.Empty;
 
         [JsonPropertyName("data_vencimento")]
-        public string? DataVencimento { get; set; }
+        public string DataVencimento { get; set; } = string.Empty;
 
         [JsonPropertyName("distribuicao")]
         public List<object> Distribuicao { get; set; }

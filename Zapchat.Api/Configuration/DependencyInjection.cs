@@ -13,6 +13,8 @@ using Zapchat.Domain.Interfaces.Clientes;
 using Zapchat.Service.Services.Clientes;
 using Zapchat.Domain.Interfaces.Messages;
 using Zapchat.Domain.Notifications;
+using Zapchat.Domain.Interfaces.FluxoCaixa;
+using Zapchat.Service.Services.FluxoCaixa;
 
 namespace Zapchat.Api.Configuration
 {
@@ -28,6 +30,7 @@ namespace Zapchat.Api.Configuration
             services.AddScoped<IGrupoWhatsAppService, GrupoWhatsAppService>();
             services.AddScoped<IValidator<UsuarioDto>, UsuarioValidator>();
             services.AddScoped<IContasPagarService, ContasPagarService>();
+            services.AddScoped<IFluxoCaixaService, FluxoCaixaService>();
             services.AddScoped<IClientesService, ClientesService>();
             services.AddScoped<IUtilsService, UtilsService>();
 

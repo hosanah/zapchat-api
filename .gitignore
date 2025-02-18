@@ -71,4 +71,6 @@ package-lock.json
 .DS_Store
 Thumbs.db
 /Zapchat.Api/obj
-/Zapchat.Service/obj/Debug
+/Zapchat.Service/obj/
+/Zapchat.Domain/obj/
+/Zapchat.Repository/obj/

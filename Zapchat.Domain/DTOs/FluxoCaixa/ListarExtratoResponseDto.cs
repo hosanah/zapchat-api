@@ -9,10 +9,10 @@ namespace Zapchat.Domain.DTOs.FluxoCaixa
         public long NCodCC { get; set; }
 
         [JsonPropertyName("cDescricao")]
-        public string CDescricao { get; set; }
+        public string CDescricao { get; set; } = string.Empty;
 
         [JsonPropertyName("cCodTipo")]
-        public string CCodTipo { get; set; }
+        public string CCodTipo { get; set; } = string.Empty;
 
         [JsonPropertyName("nSaldoAnterior")]
         public decimal NSaldoAnterior { get; set; }
@@ -37,10 +37,10 @@ namespace Zapchat.Domain.DTOs.FluxoCaixa
     public class MovimentoDto
     {
         [JsonPropertyName("cDesCliente")]
-        public string CDesCliente { get; set; }
+        public string CDesCliente { get; set; } = string.Empty;
 
         [JsonPropertyName("dDataLancamento")]
-        public string DDataLancamento { get; set; }
+        public string DDataLancamento { get; set; } = string.Empty;
 
         [JsonPropertyName("nSaldo")]
         public decimal NSaldo { get; set; }

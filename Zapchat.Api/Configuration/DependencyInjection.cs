@@ -15,6 +15,8 @@ using Zapchat.Domain.Interfaces.Messages;
 using Zapchat.Domain.Notifications;
 using Zapchat.Domain.Interfaces.FluxoCaixa;
 using Zapchat.Service.Services.FluxoCaixa;
+using Zapchat.Domain.Interfaces.ContasReceber;
+using Zapchat.Service.Services.ContasReceber;
 
 namespace Zapchat.Api.Configuration
 {
@@ -33,6 +35,7 @@ namespace Zapchat.Api.Configuration
             services.AddScoped<IFluxoCaixaService, FluxoCaixaService>();
             services.AddScoped<IClientesService, ClientesService>();
             services.AddScoped<IUtilsService, UtilsService>();
+            services.AddScoped<IContasReceberService, ContasReceberService>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();

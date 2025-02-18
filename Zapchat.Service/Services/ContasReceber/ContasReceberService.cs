@@ -7,6 +7,7 @@ using Zapchat.Domain.DTOs.ContasReceber;
 using Zapchat.Domain.Interfaces.ContasReceber;
 using System.Globalization;
 using Zapchat.Domain.DTOs.ContasPagar;
+using Zapchat.Domain.DTOs.Clientes;
 
 namespace Zapchat.Service.Services.ContasReceber
 {
@@ -44,10 +45,23 @@ namespace Zapchat.Service.Services.ContasReceber
                 var listaAtrasado = await ListarContasReceberAtrasados();
                 var listaVenceHoje = await ListarContasReceberVenceHoje();
 
-                // Adiciona as planilhas
-                await AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaReceberCadastro);
-                await AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaReceberCadastro);
-                await AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaReceberCadastro);
+                var listaClientes = new List<DadosClientesDto>();
+
+                var codigosUnicos = listaAVencer.ContaReceberCadastro
+                                    .Concat(listaAtrasado.ContaReceberCadastro)
+                                    .Concat(listaVenceHoje.ContaReceberCadastro)
+                                    .Select(x => x.CodigoClienteFornecedor)
+                                    .Distinct()
+                                    .ToList();
+
+                foreach(var codigo in codigosUnicos)
+                {
+                    listaClientes.Add(await _clientesService.ListarDadosClientesPorCod(codigo.ToString()));
+                }
+
+                await AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaReceberCadastro, listaClientes);
+                await AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaReceberCadastro, listaClientes);
+                await AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaReceberCadastro, listaClientes);
 
                 // Salvar o arquivo em memória
                 using (var memoryStream = new MemoryStream())
@@ -173,7 +187,7 @@ namespace Zapchat.Service.Services.ContasReceber
             }
         }
 
-        private async Task AdicionarPlanilha(XLWorkbook workbook, string nomePlanilha, List<ContasReceberCadastroDto> contas)
+        private async Task AdicionarPlanilha(XLWorkbook workbook, string nomePlanilha, List<ContasReceberCadastroDto> contas, List<DadosClientesDto> listaClientes)
         {
             var worksheet = workbook.AddWorksheet(nomePlanilha);
 
@@ -188,15 +202,13 @@ namespace Zapchat.Service.Services.ContasReceber
             int row = 2;
             foreach (var conta in contas)
             {
-                var fornecedor = await _clientesService.ListarDadosClientesPorCod(conta.CodigoClienteFornecedor.ToString());
-
                 worksheet.Cell(row, 1).Value = conta.CodigoLancamentoOmie;
                 worksheet.Cell(row, 2).Value = conta.CodigoClienteFornecedor;
                 worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataEmissao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 worksheet.Cell(row, 4).Value = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 worksheet.Cell(row, 5).Value = conta.StatusTitulo;
                 worksheet.Cell(row, 6).Value = conta.ValorDocumento.ToString(CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 7).Value = !string.IsNullOrEmpty(fornecedor.RazaoSocial) ? fornecedor.RazaoSocial : "Razão Social não encontrada";
+                worksheet.Cell(row, 7).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
 
                 row++;
             }

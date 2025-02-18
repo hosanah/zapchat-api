@@ -46,7 +46,7 @@ namespace Zapchat.Api.Configuration
             var appSettings = appSettingsSection.Get<AppSettingsAuth>()!;
 
 
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes("f0d7d11612e7739e337c73d6f77e990169c57994382df339c9825a9f9bb76ff0bf1cdf395276e6f415c5127f5a56e49f2afa0de5b7f3538681f80e49dea47fcc21db0213a3c9a8d4494d79f92fb11548fcd5a8c22c005ac300bf80484adc77f5");
 
             services.AddAuthentication(x =>
             {

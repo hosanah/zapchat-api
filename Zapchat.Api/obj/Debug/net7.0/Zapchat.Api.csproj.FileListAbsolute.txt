@@ -178,6 +178,7 @@ E:\dev\zapchat-api\Zapchat.Api\obj\Debug\net7.0\refint\Zapchat.Api.dll
 E:\dev\zapchat-api\Zapchat.Api\obj\Debug\net7.0\Zapchat.Api.pdb
 E:\dev\zapchat-api\Zapchat.Api\obj\Debug\net7.0\Zapchat.Api.genruntimeconfig.cache
 E:\dev\zapchat-api\Zapchat.Api\obj\Debug\net7.0\ref\Zapchat.Api.dll
+<<<<<<< HEAD
 C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Api\bin\Debug\net7.0\appsettings.Development.json
 C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Api\bin\Debug\net7.0\appsettings.json
 C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Api\bin\Debug\net7.0\Zapchat.Api.staticwebassets.endpoints.json
@@ -287,3 +288,5 @@ C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Api\obj\Debug\net7.0\refint\Zapc
 C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Api\obj\Debug\net7.0\Zapchat.Api.pdb
 C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Api\obj\Debug\net7.0\Zapchat.Api.genruntimeconfig.cache
 C:\Users\rober\Source\Repos\zapchat-api\Zapchat.Api\obj\Debug\net7.0\ref\Zapchat.Api.dll
+=======
+>>>>>>> a7f17f6b27f1d99c53ad20fec36b765c6c1c0f36

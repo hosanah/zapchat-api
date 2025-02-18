@@ -22,6 +22,6 @@ namespace Zapchat.Domain.DTOs.ContasPagar
         public int TotalDeRegistros { get; set; }
 
         [JsonPropertyName("conta_pagar_cadastro")]
-        public List<ContaPagarCadastroDto>? ContaPagarCadastro { get; set; }
+        public List<ContaPagarCadastroDto> ContaPagarCadastro { get; set; }
     }
 }

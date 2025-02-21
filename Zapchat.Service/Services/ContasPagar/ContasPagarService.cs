@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
@@ -66,11 +67,43 @@ namespace Zapchat.Service.Services.ContasPagar
                     listaClientes.Add(await _clientesService.ListarDadosClientesPorCod(codigo.ToString()));
                 }
 
+                List<string> worksheetsNames = new()
+                {
+                    "CodigoLancamentoOmie",
+                    "CodigoClienteFornecedor",
+                    "DataEmissao",
+                    "DataVencimento",
+                    "DataPrevisao",
+                    "StatusTitulo",
+                    "ValorDocumento",
+                    "Categoria",
+                    "NumeroDocumento",
+                    "Fornecedor",
+                    "CnpjFornecedor",
+                    "ParaTabulacao1",
+                    "ParaTabulacao2"
+                };
+
 
                 // Adiciona as planilhas
-                await AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaPagarCadastro, listaClientes);
-                await AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaPagarCadastro, listaClientes);
-                await AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaPagarCadastro, listaClientes);
+                await AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaPagarCadastro, listaClientes, worksheetsNames);
+                await AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaPagarCadastro, listaClientes, worksheetsNames);
+                await AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaPagarCadastro, listaClientes, worksheetsNames);
+
+                List<string> worksheetsNamesConsolidado = new()
+                {
+                    "Fornecedor",
+                    "Documento",
+                    "Valor TT",
+                    "Pago",
+                    "Atrasado",
+                    "Saldo",
+                    "Situação",
+                    "Categoria",
+                    "Quantidade 7 dias",
+                    "Total 7 dias",
+                };
+                AdicionarPlanilhaSumario(workbook, "Consolidado", worksheetsNamesConsolidado);
 
                 // Salvar o arquivo em memória
                 using (var memoryStream = new MemoryStream())
@@ -102,7 +135,8 @@ namespace Zapchat.Service.Services.ContasPagar
                         pagina = 1,
                         registros_por_pagina = 999,
                         apenas_importado_api = "N",
-                        filtrar_por_status = "ATRASADO"
+                        filtrar_por_status = "ATRASADO",
+                        filtrar_por_data_de = $"{DateTime.Now.AddDays(-30):dd/MM/yyyy}"
                     }
                 }
             };
@@ -197,17 +231,22 @@ namespace Zapchat.Service.Services.ContasPagar
             }
         }
 
-        private async Task AdicionarPlanilha(XLWorkbook workbook, string nomePlanilha, List<ContaPagarCadastroDto> contas, List<DadosClientesDto> listaClientes)
+        private async Task AdicionarPlanilha(XLWorkbook workbook, string nomePlanilha, List<ContaPagarCadastroDto> contas, List<DadosClientesDto> listaClientes, List<string> worksheetsNames)
         {
             var worksheet = workbook.AddWorksheet(nomePlanilha);
-
-            worksheet.Cell(1, 1).Value = "CodigoLancamentoOmie";
-            worksheet.Cell(1, 2).Value = "CodigoClienteFornecedor";
-            worksheet.Cell(1, 3).Value = "DataEmissao";
-            worksheet.Cell(1, 4).Value = "DataVencimento";
-            worksheet.Cell(1, 5).Value = "StatusTitulo";
-            worksheet.Cell(1, 6).Value = "ValorDocumento";
-            worksheet.Cell(1, 7).Value = "Fornecedor";
+            int worksheetrow = 1;
+            foreach (var worksheetsName in worksheetsNames)
+            {
+                string corHex = "#00569d";
+                var corXL = XLColor.FromHtml(corHex);
+                worksheet.Cell(1, worksheetrow).Value = worksheetsName;
+                // Definir uma cor de fundo em hexadecimal (Ex: Azul #3498db)
+                worksheet.Cell(1, worksheetrow).Style.Fill.BackgroundColor = corXL;
+                worksheet.Cell(1, worksheetrow).Style.Font.Bold = true;
+                worksheet.Cell(1, worksheetrow).Style.Font.FontColor = XLColor.White;
+                worksheetrow++;
+            }
+            
 
             int row = 2;
             foreach (var conta in contas)
@@ -218,12 +257,100 @@ namespace Zapchat.Service.Services.ContasPagar
                 worksheet.Cell(row, 2).Value = conta.CodigoClienteFornecedor;
                 worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataEmissao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 worksheet.Cell(row, 4).Value = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 5).Value = conta.StatusTitulo;
-                worksheet.Cell(row, 6).Value = conta.ValorDocumento.ToString(CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 7).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
+                worksheet.Cell(row, 5).Value = DateTime.ParseExact(conta.DataPrevisao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                worksheet.Cell(row, 6).Value = conta.StatusTitulo;
+                worksheet.Cell(row, 7).Value = conta.ValorDocumento;
+                worksheet.Cell(row, 7).Style.NumberFormat.Format = "#,##0.00";
+                worksheet.Cell(row, 8).Value = string.Join(", ", conta.Categorias.Select(c => c.CodigoCategoria));
+                worksheet.Cell(row, 9).Value = conta.NumeroDocumentoFiscal; 
+                worksheet.Cell(row, 10).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
+                worksheet.Cell(row, 11).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;
+                worksheet.Cell(row, 12).FormulaA1 = $"=H2"; ;
+                worksheet.Cell(row, 13).Value = Convert.ToDateTime(conta.DataVencimento).Date < DateTime.Today ? "Sim" : "Não";
 
                 row++;
             }
+            // Aplicar bordas externas e internas para toda a planilha
+            worksheet.Cells().Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
+            worksheet.Cells().Style.Border.SetInsideBorder(XLBorderStyleValues.Thin);
+
+            // Aplicar alinhamento central em todas as células
+            worksheet.Cells().Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            worksheet.Cells().Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+            
+            // Ajusta todas as colunas automaticamente
+            worksheet.Columns().AdjustToContents();
+            
+        }
+
+        private static void AdicionarPlanilhaSumario(XLWorkbook workbook, string nomePlanilha, List<string> worksheetsNames)
+        {
+            var worksheet = workbook.AddWorksheet(nomePlanilha);
+            int worksheetrow = 1;
+            foreach (var worksheetsName in worksheetsNames)
+            {
+                string corHex = "#00569d";
+                var corXL = XLColor.FromHtml(corHex);
+                worksheet.Cell(1, worksheetrow).Value = worksheetsName;
+                // Definir uma cor de fundo em hexadecimal (Ex: Azul #3498db)
+                worksheet.Cell(1, worksheetrow).Style.Fill.BackgroundColor = corXL;
+                worksheet.Cell(1, worksheetrow).Style.Font.Bold = true;
+                worksheet.Cell(1, worksheetrow).Style.Font.FontColor = XLColor.White;
+                worksheetrow++;
+            }
+
+
+            var sheets = new List<string> { "Vence em 7 dias", "Lista Atrasado", "Vence Hoje" };
+            var uniqueSuppliers = new HashSet<string>(); // Armazena fornecedores sem repetição
+
+            // Percorrer todas as planilhas especificadas
+            foreach (var sheetName in sheets)
+            {
+                var sheet = workbook.Worksheet(sheetName);
+                var col = sheet.Column("J"); // Coluna G onde estão os fornecedores
+
+                foreach (var cell in col.CellsUsed().Skip(1)) // Começa em G2
+                {
+                    string supplierName = cell.GetString().Trim();
+                    if (!string.IsNullOrEmpty(supplierName))
+                    {
+                        uniqueSuppliers.Add(supplierName); // Adiciona ao HashSet (evita duplicatas)
+
+                    }
+                }
+            }
+
+            int row = 2;
+            foreach (var supplier in uniqueSuppliers.OrderBy(x => x)) // Ordena por nome
+            {
+                worksheet.Cell(row, 1).Value = supplier;
+
+                // Adicionar a fórmula na coluna B
+                worksheet.Cell(row, 2).FormulaA1 = $"=IFERROR(VLOOKUP(A{row}, 'Lista Atrasado'!J:K, 2, 0), \"-\")";
+                worksheet.Cell(row, 3).FormulaA1 = $"=SUMIFS('Lista Atrasado'!G:G, 'Lista Atrasado'!J:J, $A{row})";
+                worksheet.Cell(row, 4).FormulaA1 = $"=SUMIFS('Lista Atrasado'!G:G, 'Lista Atrasado'!F:F, \"PAGO\", 'Lista Atrasado'!J:J, $A{row})";
+                worksheet.Cell(row, 5).FormulaA1 = $"=SUMIFS('Lista Atrasado'!G:G, 'Lista Atrasado'!F:F, \"ATRASADO\", 'Lista Atrasado'!J:J, $A{row})";
+                worksheet.Cell(row, 6).FormulaA1 = $"=IF(D{row}=C{row}, \"Pago\", \"Em Atraso\")";
+                worksheet.Cell(row, 7).FormulaA1 = $"=IF(F{row}=\"Em Atraso\", \"Pendente\", \"Conciliado\")";
+                worksheet.Cell(row, 8).FormulaA1 = $"=IFERROR(VLOOKUP(B{row}, 'Lista Atrasado'!K:L, 2, 0), \"-\")";
+                worksheet.Cell(row, 9).FormulaA1 = $"=COUNTIFS('Lista Atrasado'!M:M, \"SIM\", 'Lista Atrasado'!J:J, $A{row})";
+                worksheet.Cell(row, 10).FormulaA1 = $"=SUMIFS('Lista Atrasado'!G:G, 'Lista Atrasado'!J:J, $A{row}, 'Lista Atrasado'!M:M, \"SIM\")";
+
+                row++;
+            }
+
+
+            // Aplicar bordas externas e internas para toda a planilha
+            worksheet.Cells().Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
+            worksheet.Cells().Style.Border.SetInsideBorder(XLBorderStyleValues.Thin);
+
+            // Aplicar alinhamento central em todas as células
+            worksheet.Cells().Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            worksheet.Cells().Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+            // Ajusta todas as colunas automaticamente
+            worksheet.Columns().AdjustToContents();
+
         }
 
     }

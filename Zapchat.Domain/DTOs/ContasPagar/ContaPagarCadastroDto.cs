@@ -83,5 +83,8 @@ namespace Zapchat.Domain.DTOs.ContasPagar
 
         [JsonPropertyName("valor_documento")]
         public decimal ValorDocumento { get; set; }
+
+        [JsonPropertyName("categorias")]
+        public List<CategoriaDto> Categorias { get; set; } = new List<CategoriaDto>();
     }
 }

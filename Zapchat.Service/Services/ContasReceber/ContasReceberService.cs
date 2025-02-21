@@ -264,14 +264,14 @@ namespace Zapchat.Service.Services.ContasReceber
                 worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataPrevisao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 worksheet.Cell(row, 4).Value = conta.StatusTitulo == "ATRASADO" ? conta.StatusTitulo : "RECEBIDO";
                 worksheet.Cell(row, 5).Value = conta.ValorDocumento;
-                worksheet.Cell(row, 6).Style.NumberFormat.Format = "#,##0.00";
-                worksheet.Cell(row, 7).Value = listaCategorias.Where(e => e.Codigo == conta.CodigoCategoria).First().CodigoDre;
-                worksheet.Cell(row, 8).Value = conta.NumeroParcela;
-                worksheet.Cell(row, 9).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
-                worksheet.Cell(row, 10).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;
-                worksheet.Cell(row, 11).FormulaA1 = $"=H2"; ;
+                worksheet.Cell(row, 5).Style.NumberFormat.Format = "#,##0.00";
+                worksheet.Cell(row, 6).Value = listaCategorias.Where(e => e.Codigo == conta.CodigoCategoria).First().CodigoDre;
+                worksheet.Cell(row, 7).Value = conta.NumeroParcela;
+                worksheet.Cell(row, 8).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
+                worksheet.Cell(row, 9).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;
+                worksheet.Cell(row, 10).FormulaA1 = $"=H2"; ;
                 DateTime dataConvertida = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 12).Value = dataConvertida.Date < DateTime.Today ? "Sim" : "Não";
+                worksheet.Cell(row, 11).Value = dataConvertida.Date < DateTime.Today ? "Sim" : "Não";
 
                 row++;
             }

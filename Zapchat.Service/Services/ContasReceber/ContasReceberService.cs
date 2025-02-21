@@ -8,6 +8,9 @@ using Zapchat.Domain.Interfaces.ContasReceber;
 using System.Globalization;
 using Zapchat.Domain.DTOs.ContasPagar;
 using Zapchat.Domain.DTOs.Clientes;
+using Zapchat.Domain.Interfaces.Categoria;
+using Zapchat.Service.Services.Categoria;
+using Zapchat.Domain.DTOs.Categoria;
 
 namespace Zapchat.Service.Services.ContasReceber
 {
@@ -16,11 +19,13 @@ namespace Zapchat.Service.Services.ContasReceber
         private readonly IConfiguration _configuration;
         private readonly IUtilsService _utilsService;
         private readonly IClientesService _clientesService;
-        public ContasReceberService(IConfiguration configuration, IUtilsService utilsService, IClientesService clientesService, INotificator notificator) : base(notificator)
+        private readonly ICategoriaService _categoriaService;
+        public ContasReceberService(IConfiguration configuration, IUtilsService utilsService, IClientesService clientesService, INotificator notificator, ICategoriaService categoriaService) : base(notificator)
         {
             _configuration = configuration;
             _utilsService = utilsService;
             _clientesService = clientesService;
+            _categoriaService = categoriaService;
         }
 
         public async Task<string> ListarContasReceberExcel(ListarContasReceberExcelDto listarContasReceberExcelDto)
@@ -46,6 +51,7 @@ namespace Zapchat.Service.Services.ContasReceber
                 var listaVenceHoje = await ListarContasReceberVenceHoje();
 
                 var listaClientes = new List<DadosClientesDto>();
+                var listaCategorias = new List<DadosCategoriaDto>();
 
                 var codigosUnicos = listaAVencer.ContaReceberCadastro
                                     .Concat(listaAtrasado.ContaReceberCadastro)
@@ -57,6 +63,18 @@ namespace Zapchat.Service.Services.ContasReceber
                 foreach(var codigo in codigosUnicos)
                 {
                     listaClientes.Add(await _clientesService.ListarDadosClientesPorCod(codigo.ToString()));
+                }
+
+                var codigosUnicosCategorias = listaAVencer.ContaReceberCadastro
+                                    .Concat(listaAtrasado.ContaReceberCadastro)
+                                    .Concat(listaVenceHoje.ContaReceberCadastro)
+                                    .Select(x => x.CodigoCategoria)
+                                    .Distinct()
+                                    .ToList();
+
+                foreach (var codigo in codigosUnicosCategorias)
+                {
+                    listaCategorias.Add(await _categoriaService.ListarDadosCategoriaPorCod(codigo.ToString()));
                 }
 
                 List<string> worksheetsNames = new()
@@ -76,9 +94,9 @@ namespace Zapchat.Service.Services.ContasReceber
                     "ParaTabulacao2"
                 };
 
-                AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaReceberCadastro, listaClientes, worksheetsNames);
-                AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaReceberCadastro, listaClientes, worksheetsNames);
-                AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaReceberCadastro, listaClientes, worksheetsNames);
+                AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaReceberCadastro, listaClientes, listaCategorias, worksheetsNames);
+                AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaReceberCadastro, listaClientes, listaCategorias, worksheetsNames);
+                AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaReceberCadastro, listaClientes, listaCategorias, worksheetsNames);
 
                 List<string> worksheetsNamesConsolidado = new()
                 {
@@ -221,7 +239,7 @@ namespace Zapchat.Service.Services.ContasReceber
             }
         }
 
-        private static void AdicionarPlanilha(XLWorkbook workbook, string nomePlanilha, List<ContasReceberCadastroDto> contas, List<DadosClientesDto> listaClientes, List<string> worksheetsNames)
+        private static void AdicionarPlanilha(XLWorkbook workbook, string nomePlanilha, List<ContasReceberCadastroDto> contas, List<DadosClientesDto> listaClientes, List<DadosCategoriaDto> listaCategorias, List<string> worksheetsNames)
         {
             var worksheet = workbook.AddWorksheet(nomePlanilha);
 
@@ -241,21 +259,19 @@ namespace Zapchat.Service.Services.ContasReceber
             int row = 2;
             foreach (var conta in contas)
             {
-                worksheet.Cell(row, 1).Value = conta.CodigoLancamentoOmie;
-                worksheet.Cell(row, 2).Value = conta.CodigoClienteFornecedor;
-                worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataEmissao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 4).Value = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 5).Value = DateTime.ParseExact(conta.DataPrevisao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 6).Value = conta.StatusTitulo;
-                worksheet.Cell(row, 7).Value = conta.ValorDocumento;
-                worksheet.Cell(row, 7).Style.NumberFormat.Format = "#,##0.00";
-                worksheet.Cell(row, 8).Value = string.Join(", ", conta.Categorias.Select(c => c.CodigoCategoria));
-                worksheet.Cell(row, 9).Value = conta.NumeroParcela;
-                worksheet.Cell(row, 10).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
-                worksheet.Cell(row, 11).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;
-                worksheet.Cell(row, 12).FormulaA1 = $"=H2"; ;
+                worksheet.Cell(row, 1).Value = DateTime.ParseExact(conta.DataEmissao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                worksheet.Cell(row, 2).Value = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataPrevisao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                worksheet.Cell(row, 4).Value = conta.StatusTitulo;
+                worksheet.Cell(row, 5).Value = conta.ValorDocumento;
+                worksheet.Cell(row, 6).Style.NumberFormat.Format = "#,##0.00";
+                worksheet.Cell(row, 7).Value = listaCategorias.Where(e => e.Codigo == conta.CodigoCategoria).First().CodigoDre;
+                worksheet.Cell(row, 8).Value = conta.NumeroParcela;
+                worksheet.Cell(row, 9).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
+                worksheet.Cell(row, 10).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;
+                worksheet.Cell(row, 11).FormulaA1 = $"=H2"; ;
                 DateTime dataConvertida = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 13).Value = dataConvertida.Date < DateTime.Today ? "Sim" : "Não";
+                worksheet.Cell(row, 12).Value = dataConvertida.Date < DateTime.Today ? "Sim" : "Não";
 
                 row++;
             }
@@ -315,15 +331,15 @@ namespace Zapchat.Service.Services.ContasReceber
                 worksheet.Cell(row, 1).Value = supplier;
 
                 // Adicionar a fórmula na coluna B
-                worksheet.Cell(row, 2).FormulaA1 = $"=IFERROR(VLOOKUP(A{row}, 'Lista Atrasado'!J:K, 2, 0), \"-\")";
-                worksheet.Cell(row, 3).FormulaA1 = $"=SUMIFS('Lista Atrasado'!G:G, 'Lista Atrasado'!J:J, $A{row})";
-                worksheet.Cell(row, 4).FormulaA1 = $"=SUMIFS('Lista Atrasado'!G:G, 'Lista Atrasado'!F:F, \"PAGO\", 'Lista Atrasado'!J:J, $A{row})";
-                worksheet.Cell(row, 5).FormulaA1 = $"=SUMIFS('Lista Atrasado'!G:G, 'Lista Atrasado'!F:F, \"ATRASADO\", 'Lista Atrasado'!J:J, $A{row})";
+                worksheet.Cell(row, 2).FormulaA1 = $"=IFERROR(VLOOKUP(A{row}, 'Lista Atrasado'!H:I, 2, 0), \"-\")";
+                worksheet.Cell(row, 3).FormulaA1 = $"=SUMIFS('Lista Atrasado'!E:E, 'Lista Atrasado'!F:F, $A{row})";
+                worksheet.Cell(row, 4).FormulaA1 = $"=SUMIFS('Lista Atrasado'!E:E, 'Lista Atrasado'!D:D, \"PAGO\", 'Lista Atrasado'!H:H, $A{row})";
+                worksheet.Cell(row, 5).FormulaA1 = $"=SUMIFS('Lista Atrasado'!E:E, 'Lista Atrasado'!D:D, \"ATRASADO\", 'Lista Atrasado'!H:H, $A{row})";
                 worksheet.Cell(row, 6).FormulaA1 = $"=IF(D{row}=C{row}, \"Pago\", \"Em Atraso\")";
                 worksheet.Cell(row, 7).FormulaA1 = $"=IF(F{row}=\"Em Atraso\", \"Pendente\", \"Conciliado\")";
-                worksheet.Cell(row, 8).FormulaA1 = $"=IFERROR(VLOOKUP(B{row}, 'Lista Atrasado'!K:L, 2, 0), \"-\")";
-                worksheet.Cell(row, 9).FormulaA1 = $"=COUNTIFS('Lista Atrasado'!M:M, \"SIM\", 'Lista Atrasado'!J:J, $A{row})";
-                worksheet.Cell(row, 10).FormulaA1 = $"=SUMIFS('Lista Atrasado'!G:G, 'Lista Atrasado'!J:J, $A{row}, 'Lista Atrasado'!M:M, \"SIM\")";
+                worksheet.Cell(row, 8).FormulaA1 = $"=IFERROR(VLOOKUP(B{row}, 'Lista Atrasado'!I:J, 2, 0), \"-\")";
+                worksheet.Cell(row, 9).FormulaA1 = $"=COUNTIFS('Lista Atrasado'!K:K, \"SIM\", 'Lista Atrasado'!H:H, $A{row})";
+                worksheet.Cell(row, 10).FormulaA1 = $"=SUMIFS('Lista Atrasado'!E:E, 'Lista Atrasado'!H:H, $A{row}, 'Lista Atrasado'!K:K, \"SIM\")";
 
                 row++;
             }

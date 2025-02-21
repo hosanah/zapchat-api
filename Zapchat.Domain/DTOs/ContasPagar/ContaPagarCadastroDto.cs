@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Zapchat.Domain.DTOs.Categoria;
 
 namespace Zapchat.Domain.DTOs.ContasPagar
 {
@@ -16,7 +17,7 @@ namespace Zapchat.Domain.DTOs.ContasPagar
         public string? Bloqueado { get; set; }
 
         [JsonPropertyName("codigo_categoria")]
-        public string? CodigoCategoria { get; set; }
+        public string CodigoCategoria { get; set; } = string.Empty;
 
         [JsonPropertyName("codigo_cliente_fornecedor")]
         public long CodigoClienteFornecedor { get; set; }

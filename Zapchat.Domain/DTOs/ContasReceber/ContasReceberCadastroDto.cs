@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Zapchat.Domain.DTOs.Categoria;
 
 namespace Zapchat.Domain.DTOs.ContasReceber
 {

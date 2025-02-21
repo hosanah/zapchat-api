@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Zapchat.Domain.DTOs
+namespace Zapchat.Domain.DTOs.Categoria
 {
     public class CategoriaDto
     {

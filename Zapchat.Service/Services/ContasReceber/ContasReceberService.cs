@@ -262,7 +262,7 @@ namespace Zapchat.Service.Services.ContasReceber
                 worksheet.Cell(row, 1).Value = DateTime.ParseExact(conta.DataEmissao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 worksheet.Cell(row, 2).Value = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataPrevisao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 4).Value = conta.StatusTitulo;
+                worksheet.Cell(row, 4).Value = conta.StatusTitulo == "ATRASADO" ? conta.StatusTitulo : "RECEBIDO";
                 worksheet.Cell(row, 5).Value = conta.ValorDocumento;
                 worksheet.Cell(row, 6).Style.NumberFormat.Format = "#,##0.00";
                 worksheet.Cell(row, 7).Value = listaCategorias.Where(e => e.Codigo == conta.CodigoCategoria).First().CodigoDre;

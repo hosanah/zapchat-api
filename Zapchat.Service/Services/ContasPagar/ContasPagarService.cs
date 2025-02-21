@@ -277,7 +277,7 @@ namespace Zapchat.Service.Services.ContasPagar
                 worksheet.Cell(row, 7).Value = conta.NumeroDocumentoFiscal; 
                 worksheet.Cell(row, 8).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
                 worksheet.Cell(row, 9).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;
-                worksheet.Cell(row, 10).FormulaA1 = $"=H2"; ;
+                worksheet.Cell(row, 10).FormulaA1 = $"=F2"; ;
                 DateTime dataConvertida = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 worksheet.Cell(row, 11).Value = dataConvertida.Date < DateTime.Today ? "Sim" : "Não";
 

@@ -273,7 +273,7 @@ namespace Zapchat.Service.Services.ContasPagar
                 worksheet.Cell(row, 4).Value = conta.StatusTitulo == "ATRASADO" ? conta.StatusTitulo : "RECEBIDO";
                 worksheet.Cell(row, 5).Value = conta.ValorDocumento;
                 worksheet.Cell(row, 5).Style.NumberFormat.Format = "#,##0.00";
-                worksheet.Cell(row, 6).Value = listaCategorias.Where(e => e.Codigo == conta.CodigoCategoria).First().CodigoDre;
+                worksheet.Cell(row, 6).Value = listaCategorias.Where(e => e.Codigo == conta.CodigoCategoria).First().Descricao;
                 worksheet.Cell(row, 7).Value = conta.NumeroDocumentoFiscal; 
                 worksheet.Cell(row, 8).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
                 worksheet.Cell(row, 9).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;

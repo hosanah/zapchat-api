@@ -265,7 +265,8 @@ namespace Zapchat.Service.Services.ContasPagar
                 worksheet.Cell(row, 10).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
                 worksheet.Cell(row, 11).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;
                 worksheet.Cell(row, 12).FormulaA1 = $"=H2"; ;
-                worksheet.Cell(row, 13).Value = Convert.ToDateTime(conta.DataVencimento).Date < DateTime.Today ? "Sim" : "Não";
+                DateTime dataConvertida = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                worksheet.Cell(row, 13).Value = dataConvertida.Date < DateTime.Today ? "Sim" : "Não";
 
                 row++;
             }

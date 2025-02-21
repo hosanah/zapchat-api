@@ -86,9 +86,9 @@ namespace Zapchat.Service.Services.ContasPagar
 
 
                 // Adiciona as planilhas
-                await AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaPagarCadastro, listaClientes, worksheetsNames);
-                await AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaPagarCadastro, listaClientes, worksheetsNames);
-                await AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaPagarCadastro, listaClientes, worksheetsNames);
+                AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaPagarCadastro, listaClientes, worksheetsNames);
+                AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaPagarCadastro, listaClientes, worksheetsNames);
+                AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaPagarCadastro, listaClientes, worksheetsNames);
 
                 List<string> worksheetsNamesConsolidado = new()
                 {
@@ -231,9 +231,10 @@ namespace Zapchat.Service.Services.ContasPagar
             }
         }
 
-        private async Task AdicionarPlanilha(XLWorkbook workbook, string nomePlanilha, List<ContaPagarCadastroDto> contas, List<DadosClientesDto> listaClientes, List<string> worksheetsNames)
+        private static void AdicionarPlanilha(XLWorkbook workbook, string nomePlanilha, List<ContaPagarCadastroDto> contas, List<DadosClientesDto> listaClientes, List<string> worksheetsNames)
         {
             var worksheet = workbook.AddWorksheet(nomePlanilha);
+
             int worksheetrow = 1;
             foreach (var worksheetsName in worksheetsNames)
             {
@@ -251,8 +252,6 @@ namespace Zapchat.Service.Services.ContasPagar
             int row = 2;
             foreach (var conta in contas)
             {
-                var fornecedor = await _clientesService.ListarDadosClientesPorCod(conta.CodigoClienteFornecedor.ToString());
-
                 worksheet.Cell(row, 1).Value = conta.CodigoLancamentoOmie;
                 worksheet.Cell(row, 2).Value = conta.CodigoClienteFornecedor;
                 worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataEmissao, "dd/MM/yyyy", CultureInfo.InvariantCulture);

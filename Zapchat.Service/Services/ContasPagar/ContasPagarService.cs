@@ -320,7 +320,7 @@ namespace Zapchat.Service.Services.ContasPagar
             foreach (var sheetName in sheets)
             {
                 var sheet = workbook.Worksheet(sheetName);
-                var col = sheet.Column("J"); // Coluna G onde estão os fornecedores
+                var col = sheet.Column("H"); // Coluna G onde estão os fornecedores
 
                 foreach (var cell in col.CellsUsed().Skip(1)) // Começa em G2
                 {

@@ -9,5 +9,7 @@ namespace Zapchat.Domain.Interfaces
         Task<GrupoWhatsAppDto> AddAsync(GrupoWhatsAppDto usuarioDto);
         Task<GrupoWhatsAppDto?> UpdateAsync(Guid id, GrupoWhatsAppDto usuarioDto);
         Task<bool> DeleteAsync(Guid id);
+        Task<AutoConfigurarGrupoDto> AutoConfigurarGrupo(AutoConfigurarGrupoDto usuarioDto);
+        Task<IEnumerable<AutoConfigurarGrupoDto>> BuscarTodasConfigurações();
     }
 }

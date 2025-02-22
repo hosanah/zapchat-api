@@ -1,20 +1,42 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Zapchat.Domain.Interfaces;
 using Zapchat.Domain.DTOs;
+using Zapchat.Domain.Interfaces.Messages;
 
 namespace Zapchat.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GrupoWhatsAppController : ControllerBase
+    public class GrupoWhatsAppController : MainController
     {
         private readonly IGrupoWhatsAppService _grupoWhatsAppservice;
 
-        public GrupoWhatsAppController(IGrupoWhatsAppService grupoWhatsAppservice)
+        public GrupoWhatsAppController(INotificator notificator, IGrupoWhatsAppService grupoWhatsAppservice) : base(notificator)
         {
             _grupoWhatsAppservice = grupoWhatsAppservice;
         }
 
+        [HttpPost("Configurar")]
+        public async Task<IActionResult> AutoConfigurarGrupo([FromBody] AutoConfigurarGrupoDto dto)
+        {
+            return CustomResponse(await _grupoWhatsAppservice.AutoConfigurarGrupo(dto));
+        }
+
+
+        [HttpGet("BuscarTodasConfigurações")]
+        public async Task<IEnumerable<AutoConfigurarGrupoDto>> ListarTodos() => await _grupoWhatsAppservice.BuscarTodasConfigurações();
+
+        /*[HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var grupo = await _grupoWhatsAppservice.GetByIdAsync(id);
+            if (grupo == null)
+                return NotFound();
+
+            return Ok(grupo);
+        }
+
+        
         [HttpGet]
         public async Task<IEnumerable<GrupoWhatsAppDto>> ListarTodos() => await _grupoWhatsAppservice.GetAllAsync();
 
@@ -27,6 +49,7 @@ namespace Zapchat.Api.Controllers
 
             return Ok(grupo);
         }
+        
 
 
         [HttpPost]
@@ -56,6 +79,6 @@ namespace Zapchat.Api.Controllers
         {
             await _grupoWhatsAppservice.DeleteAsync(id);
             return NoContent();
-        }
+        }*/
     }
 }

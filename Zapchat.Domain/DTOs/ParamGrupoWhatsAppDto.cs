@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Zapchat.Domain.DTOs
 {
-    internal class ParamGrupoWhatsAppDto
+    public class ParamGrupoWhatsAppDto
     {
     }
 }

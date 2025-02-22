@@ -15,7 +15,7 @@ namespace Zapchat.Api.Controllers
             _usuarioService = usuarioService;
         }
 
-        [HttpGet]
+        /*[HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var usuarios = await _usuarioService.GetAllAsync();
@@ -60,6 +60,6 @@ namespace Zapchat.Api.Controllers
             if (!deleted) return NotFound();
 
             return NoContent();
-        }
+        }*/
     }
 }

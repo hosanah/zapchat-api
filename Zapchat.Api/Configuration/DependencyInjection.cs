@@ -39,6 +39,8 @@ namespace Zapchat.Api.Configuration
             services.AddScoped<IUtilsService, UtilsService>();
             services.AddScoped<IContasReceberService, ContasReceberService>();
             services.AddScoped<ICategoriaService, CategoriaService>();
+            services.AddScoped<IAdmsGrupoRepository, AdmsGrupoRepository>();
+            services.AddScoped<IParametroSistemaRepository, ParametroSistemaRepository>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();

@@ -9,9 +9,23 @@ using Asp.Versioning.ApiExplorer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuração do DbContext com SQLite
+/*// Configuração do DbContext com SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));*/
+
+var dbPath = Path.Combine(AppContext.BaseDirectory, "database", "Zapchat.db");
+
+// Garante que o diretório do banco existe
+var dbDirectory = Path.GetDirectoryName(dbPath);
+if (!Directory.Exists(dbDirectory))
+{
+    Directory.CreateDirectory(dbDirectory!);
+}
+
+// Configura a conexão com o banco corrigindo o caminho
+var connectionString = $"Data Source={dbPath}";
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(connectionString));
 
 // Injeção de dependência
 builder.Services.AddEndpointsApiExplorer();

@@ -23,6 +23,26 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options => { optio
 var app = builder.Build();
 var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
+// Executar migrações apenas em ambiente de produção
+if (!app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        // Verifica se o banco de dados existe
+        if (!dbContext.Database.CanConnect())
+        {
+            dbContext.Database.EnsureCreated(); // Cria o banco se não existir
+        }
+        else if (dbContext.Database.GetPendingMigrations().Any())
+        {
+            dbContext.Database.Migrate(); // Aplica as migrações pendentes
+        }
+    }
+}
+
+
 // Configure the HTTP request pipeline.
 app.UseSwaggerConfig(provider);
 app.MapControllers();

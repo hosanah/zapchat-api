@@ -12,6 +12,6 @@ RUN dotnet publish -c Release -o out
 
 # Runtime final
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
-WORKDIR /app
+WORKDIR /app/api
 COPY --from=build /app/out .
 ENTRYPOINT ["./Zapchat.Api"]

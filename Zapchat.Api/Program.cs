@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 var environment = builder.Environment.EnvironmentName;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// Se for ambiente de produção, usa um caminho fixo para o banco
 if (!builder.Environment.IsDevelopment())
 {
     var dbPath = Path.Combine(AppContext.BaseDirectory, "database", "Zapchat.db");
@@ -51,6 +52,10 @@ if (!app.Environment.IsDevelopment())
         if (!dbContext.Database.CanConnect())
         {
             dbContext.Database.EnsureCreated(); // Cria o banco se não existir
+        }
+        else if (dbContext.Database.GetPendingMigrations().Any() && !dbContext.Database.GetPendingMigrations().Contains("20250214021821_Inicial"))
+        {
+            dbContext.Database.Migrate(); // Aplica as migrações pendentes
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Zapchat.Domain.DTOs
 {
     public class AutoConfigurarGrupoDto
     {
+        public Guid? GrupoGid { get; set; }
         public string ApiKey { get; set; } = string.Empty;
         public string ApiSecrect { get; set; } = string.Empty;
         public string GrupoIdentificador { get; set; } = string.Empty;

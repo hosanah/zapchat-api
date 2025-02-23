@@ -26,6 +26,14 @@ namespace Zapchat.Api.Controllers
         [HttpGet("BuscarTodasConfigurações")]
         public async Task<IEnumerable<AutoConfigurarGrupoDto>> ListarTodos() => await _grupoWhatsAppservice.BuscarTodasConfigurações();
 
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Deletar(Guid id)
+        {
+            await _grupoWhatsAppservice.DeleteAsync(id);
+            return NoContent();
+        }
+
         /*[HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {

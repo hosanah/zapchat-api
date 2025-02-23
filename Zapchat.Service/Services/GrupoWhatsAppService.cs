@@ -17,14 +17,16 @@ namespace Zapchat.Service.Services
         private readonly IConfiguration _configuration;
         private readonly IAdmsGrupoRepository _admsRepository;
         private readonly IParametroSistemaRepository _paramRepository;
+        private readonly IUtilsService _utilsService;
 
-        public GrupoWhatsAppService(IGrupoWhatsAppRepository repository, IConfiguration configuration, INotificator notificator, IMapper mapper, IAdmsGrupoRepository admsRepository, IParametroSistemaRepository paramRepository) : base(notificator)
+        public GrupoWhatsAppService(IGrupoWhatsAppRepository repository, IConfiguration configuration, INotificator notificator, IMapper mapper, IAdmsGrupoRepository admsRepository, IParametroSistemaRepository paramRepository, IUtilsService utilsService) : base(notificator)
         {
             _repository = repository;
             _mapper = mapper;
             _configuration = configuration;
             _admsRepository = admsRepository;
-            _paramRepository = paramRepository; 
+            _paramRepository = paramRepository;
+            _utilsService = utilsService;
         }
 
         public async Task<GrupoWhatsAppDto> AddAsync(GrupoWhatsAppDto grupoDto)
@@ -56,6 +58,28 @@ namespace Zapchat.Service.Services
         {
             try
             {
+                var validacoes = new List<string>();
+                var grupos = await _repository.GetAllAsync();
+                if (grupos.Any(e => e.Identificador.Equals(configDto.GrupoIdentificador)))
+                    validacoes.Add("Já existe um grupo cadastrado com o mesmo identificados!");
+
+                var parametros = await _paramRepository.GetAllAsync();
+                if (parametros.Any(e => e.AppKey.Equals(configDto.ApiKey)))
+                    validacoes.Add("Já existe um ApiKey cadastrado com o mesmo identificados!");
+
+                if (parametros.Any(e => e.AppSecret.Equals(configDto.ApiSecrect)))
+                    validacoes.Add("Já existe um ApiSecrect cadastrado com o mesmo identificados!");
+
+                if (validacoes.Any())
+                {
+                    foreach (var validacao in validacoes)
+                    {
+                        Notify(validacao);
+                    }
+
+                    return null;
+                }
+
                 // ✅ Criando entidade GrupoWhatsApp
                 var novoGrupo = new GrupoWhatsApp(configDto);
                 await _repository.AddAsync(novoGrupo);
@@ -77,6 +101,7 @@ namespace Zapchat.Service.Services
                 var parametro = new ParamGrupoWhatsApp(configDto.ApiKey, configDto.ApiSecrect);
                 parametro.GrupoId = novoGrupo.Id;
                 await _paramRepository.AddAsync(parametro);
+                configDto.GrupoGid = novoGrupo.Id;
                 return configDto;
             }
             catch (Exception ex)
@@ -100,6 +125,7 @@ namespace Zapchat.Service.Services
 
                 var dto = new AutoConfigurarGrupoDto
                 {
+                    GrupoGid = grupo.Id,
                     GrupoNome = grupo.Nome,
                     GrupoIdentificador = grupo.Identificador,
                     ApiKey = parametros.AppKey,
@@ -116,9 +142,19 @@ namespace Zapchat.Service.Services
             return resultado;
         }
 
-        public Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _repository.DeleteAsync(id);
+                return true;
+            }   
+            catch (Exception)
+            {
+
+                Notify("Já existe um grupo cadast   rado com o mesmo identificados!");
+                return false;
+            }
         }
 
         public Task<IEnumerable<GrupoWhatsAppDto>> GetAllAsync()

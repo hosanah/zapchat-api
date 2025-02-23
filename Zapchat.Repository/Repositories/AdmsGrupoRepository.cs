@@ -44,6 +44,19 @@ namespace Zapchat.Repository.Repositories
             }
         }
 
+        public async Task DeleteByGrupoIdAsync(Guid id)
+        {
+            var adms = await GetAllAsync();
+            if (adms.Any(e => e.GrupoId == id))
+            {
+                foreach (var adm in adms.Where(e => e.GrupoId == id)) 
+                {
+                    _context.AdmsGrupoWhatsApp.Remove(adm);
+                }
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<IEnumerable<AdmGrupoWhatsApp>> GetByGrupoIdAsync(Guid grupoId) =>
         await _context.AdmsGrupoWhatsApp
         .Where(adm => adm.GrupoId == grupoId)

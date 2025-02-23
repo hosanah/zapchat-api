@@ -146,6 +146,8 @@ namespace Zapchat.Service.Services
         {
             try
             {
+                await _paramRepository.DeleteByGrupoIdAsync(id);
+                await _admsRepository.DeleteByGrupoIdAsync(id);
                 await _repository.DeleteAsync(id);
                 return true;
             }   

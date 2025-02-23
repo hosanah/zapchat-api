@@ -16,5 +16,6 @@ namespace Zapchat.Domain.Interfaces
         Task UpdateAsync(ParamGrupoWhatsApp param);
         Task DeleteAsync(Guid id);
         Task<ParamGrupoWhatsApp> GetByGrupoIdAsync(Guid grupoId);
+        Task DeleteByGrupoIdAsync(Guid id);
     }
 }

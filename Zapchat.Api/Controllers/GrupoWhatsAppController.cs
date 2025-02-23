@@ -34,6 +34,12 @@ namespace Zapchat.Api.Controllers
             return NoContent();
         }
 
+        [HttpPost("LimparBase")]
+        public async Task<IActionResult> LimparBase([FromBody] AutoConfigurarGrupoDto dto)
+        {
+            return CustomResponse(await _grupoWhatsAppservice.AutoConfigurarGrupo(dto));
+        }
+
         /*[HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {

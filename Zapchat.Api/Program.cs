@@ -9,21 +9,25 @@ using Asp.Versioning.ApiExplorer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/*// Configuração do DbContext com SQLite
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));*/
+var environment = builder.Environment.EnvironmentName;
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-var dbPath = Path.Combine(AppContext.BaseDirectory, "database", "Zapchat.db");
-
-// Garante que o diretório do banco existe
-var dbDirectory = Path.GetDirectoryName(dbPath);
-if (!Directory.Exists(dbDirectory))
+// Se for ambiente de produção, usa um caminho fixo para o banco
+if (!builder.Environment.IsDevelopment())
 {
-    Directory.CreateDirectory(dbDirectory!);
+    var dbPath = Path.Combine(AppContext.BaseDirectory, "database", "Zapchat.db");
+
+    // Garante que o diretório do banco existe
+    var dbDirectory = Path.GetDirectoryName(dbPath);
+    if (!Directory.Exists(dbDirectory))
+    {
+        Directory.CreateDirectory(dbDirectory!);
+    }
+
+    connectionString = $"Data Source={dbPath}";
 }
 
-// Configura a conexão com o banco corrigindo o caminho
-var connectionString = $"Data Source={dbPath}";
+// Configura a conexão correta
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
 

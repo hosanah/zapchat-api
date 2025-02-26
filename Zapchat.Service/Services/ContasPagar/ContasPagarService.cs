@@ -11,6 +11,7 @@ using Zapchat.Domain.DTOs.Categoria;
 using Zapchat.Domain.DTOs.Clientes;
 using Zapchat.Domain.DTOs.ContasPagar;
 using Zapchat.Domain.DTOs.ContasReceber;
+using Zapchat.Domain.Entities;
 using Zapchat.Domain.Interfaces;
 using Zapchat.Domain.Interfaces.Categoria;
 using Zapchat.Domain.Interfaces.Clientes;
@@ -25,37 +26,57 @@ namespace Zapchat.Service.Services.ContasPagar
         private readonly IUtilsService _utilsService;
         private readonly IClientesService _clientesService;
         private readonly ICategoriaService _categoriaService;
+        private readonly IParametroSistemaService _parametroSistemaService;
         private readonly SemaphoreSlim _semaphore = new(5);
-        public ContasPagarService(IUtilsService utilsService, IClientesService clientesService, IConfiguration configuration, INotificator notificator, ICategoriaService categoriaService) : base(notificator) 
+        public ContasPagarService(IUtilsService utilsService, 
+            IClientesService clientesService, 
+            IConfiguration configuration, 
+            INotificator notificator, 
+            ICategoriaService categoriaService, 
+            IParametroSistemaService 
+            parametroSistemaService) : base(notificator) 
         {
             _configuration = configuration;
             _utilsService = utilsService;
             _clientesService = clientesService;
             _categoriaService = categoriaService;
+            _parametroSistemaService = parametroSistemaService;
         }
 
         public async Task<string> ListarContasPagarExcel(ListarContasPagarExcelDto listarContasPagarExcelDto)
         {
-
-            try
+            if (!string.IsNullOrWhiteSpace(listarContasPagarExcelDto.GrupoIdentificador))
             {
-                return await ExportarContasPagarXlsxBase64();
-            }
-            catch (Exception ex)
+                try
+                {
+                    return await ExportarContasPagarXlsxBase64(listarContasPagarExcelDto.GrupoIdentificador);
+                }
+                catch (Exception ex)
+                {
+                    Notify($"A solicitação não retornou dados!{ex.Message}");
+                    return string.Empty;
+                }
+            } 
+            else 
             {
-                Notify($"A solicitação não retornou dados!{ex.Message}");
+                Notify($"É necessário informar o Grupo Identificador");
                 return string.Empty;
             }
+            
         }
 
-        public async Task<string> ExportarContasPagarXlsxBase64()
+        public async Task<string> ExportarContasPagarXlsxBase64(string grupoIdentificador)
         {
+
+            var parametros = await _parametroSistemaService.BuscarParammetroPorGrupoIdentificador(grupoIdentificador);
+            if (parametros == null)
+                return string.Empty;
             // Criar o arquivo Excel em memória
             using (var workbook = new XLWorkbook())
             {
-                var listaAVencer = await ListarContasPagarSeteDias();
-                var listaAtrasado = await ListarContasPagarAtrasados();
-                var listaVenceHoje = await ListarContasPagarVenceHoje();
+                var listaAVencer = await ListarContasPagarSeteDias(parametros);
+                var listaAtrasado = await ListarContasPagarAtrasados(parametros);
+                var listaVenceHoje = await ListarContasPagarVenceHoje(parametros);
 
                 var listaClientes = new List<DadosClientesDto>();
                 var listaCategorias = new List<DadosCategoriaDto>();
@@ -69,7 +90,7 @@ namespace Zapchat.Service.Services.ContasPagar
 
                 foreach (var codigo in codigosUnicosFornecedores)
                 {
-                    listaClientes.Add(await _clientesService.ListarDadosClientesPorCod(codigo.ToString()));
+                    listaClientes.Add(await _clientesService.ListarDadosClientesPorCod(codigo.ToString(), grupoIdentificador));
                 }
 
                 var codigosUnicosCategorias = listaAVencer.ContaPagarCadastro
@@ -81,7 +102,7 @@ namespace Zapchat.Service.Services.ContasPagar
 
                 foreach (var codigo in codigosUnicosCategorias)
                 {
-                    listaCategorias.Add(await _categoriaService.ListarDadosCategoriaPorCod(codigo.ToString()));
+                    listaCategorias.Add(await _categoriaService.ListarDadosCategoriaPorCod(codigo.ToString(), grupoIdentificador));
                 }
 
                 List<string> worksheetsNames = new()
@@ -130,7 +151,7 @@ namespace Zapchat.Service.Services.ContasPagar
             }
         }
 
-        private async Task<ListarContasPagarDto> ListarContasPagarAtrasados()
+        private async Task<ListarContasPagarDto> ListarContasPagarAtrasados(ParamGrupoWhatsApp param)
         {
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];
             if (string.IsNullOrEmpty(baseUri))
@@ -141,8 +162,8 @@ namespace Zapchat.Service.Services.ContasPagar
             var request = new
             {
                 call = "ListarContasPagar",
-                app_key = "1490222176443",
-                app_secret = "6f2b10cb4d043172aa2e083613994aef",
+                app_key = $"{param.AppKey}",
+                app_secret = $"{param.AppSecret}",
                 param = new[]
                 {
                     new
@@ -169,7 +190,7 @@ namespace Zapchat.Service.Services.ContasPagar
             }
         }
 
-        private async Task<ListarContasPagarDto> ListarContasPagarVenceHoje()
+        private async Task<ListarContasPagarDto> ListarContasPagarVenceHoje(ParamGrupoWhatsApp param)
         {
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];
             if (string.IsNullOrEmpty(baseUri))
@@ -180,8 +201,8 @@ namespace Zapchat.Service.Services.ContasPagar
             var request = new
             {
                 call = "ListarContasPagar",
-                app_key = "1490222176443",
-                app_secret = "6f2b10cb4d043172aa2e083613994aef",
+                app_key = $"{param.AppKey}",
+                app_secret = $"{param.AppSecret}",
                 param = new[]
                 {
                     new
@@ -207,7 +228,7 @@ namespace Zapchat.Service.Services.ContasPagar
             }
         }
 
-        private async Task<ListarContasPagarDto> ListarContasPagarSeteDias()
+        private async Task<ListarContasPagarDto> ListarContasPagarSeteDias(ParamGrupoWhatsApp param)
         {
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];
             if (string.IsNullOrEmpty(baseUri))
@@ -218,8 +239,8 @@ namespace Zapchat.Service.Services.ContasPagar
             var request = new
             {
                 call = "ListarContasPagar",
-                app_key = "1490222176443",
-                app_secret = "6f2b10cb4d043172aa2e083613994aef",
+                app_key = $"{param.AppKey}",
+                app_secret = $"{param.AppSecret}",
                 param = new[]
                 {
                     new

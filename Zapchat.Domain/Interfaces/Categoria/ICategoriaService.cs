@@ -9,6 +9,6 @@ namespace Zapchat.Domain.Interfaces.Categoria
 {
     public interface ICategoriaService
     {
-        Task<DadosCategoriaDto> ListarDadosCategoriaPorCod(string codCategoria);
+        Task<DadosCategoriaDto> ListarDadosCategoriaPorCod(string codCategoria, string grupoIdentificador);
     }
 }

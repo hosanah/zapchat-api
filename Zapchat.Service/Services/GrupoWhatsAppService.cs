@@ -169,6 +169,11 @@ namespace Zapchat.Service.Services
             throw new NotImplementedException();
         }
 
+        public Task<GrupoWhatsApp?> GetByIdentificadorAsync(string identificador)
+        {
+            return _repository.GetByIdentificadorAsync(identificador);
+        }
+
         public Task<GrupoWhatsAppDto?> UpdateAsync(Guid id, GrupoWhatsAppDto usuarioDto)
         {
             throw new NotImplementedException();

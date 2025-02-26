@@ -41,5 +41,8 @@ namespace Zapchat.Repository.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<GrupoWhatsApp?> GetByIdentificadorAsync(string identificador) =>
+            await _context.GruposWhatsApp.FirstOrDefaultAsync(param => param.Identificador == identificador);
     }
 }

@@ -20,29 +20,46 @@ namespace Zapchat.Service.Services.ContasReceber
         private readonly IUtilsService _utilsService;
         private readonly IClientesService _clientesService;
         private readonly ICategoriaService _categoriaService;
-        public ContasReceberService(IConfiguration configuration, IUtilsService utilsService, IClientesService clientesService, INotificator notificator, ICategoriaService categoriaService) : base(notificator)
+        private readonly IParametroSistemaService _parametroSistemaService;
+        public ContasReceberService(IConfiguration configuration, 
+            IUtilsService utilsService, IClientesService clientesService, 
+            INotificator notificator, ICategoriaService categoriaService, 
+            IParametroSistemaService parametroSistemaService) : base(notificator)
         {
             _configuration = configuration;
             _utilsService = utilsService;
             _clientesService = clientesService;
             _categoriaService = categoriaService;
+            _parametroSistemaService = parametroSistemaService;
         }
 
         public async Task<string> ListarContasReceberExcel(ListarContasReceberExcelDto listarContasReceberExcelDto)
         {
-            try
+            if (!string.IsNullOrWhiteSpace(listarContasReceberExcelDto.GrupoIdentificador))
             {
-                return await ExportarContasReceberXlsxBase64();
+                try
+                {
+                    return await ExportarContasReceberXlsxBase64(listarContasReceberExcelDto.GrupoIdentificador);
+                }
+                catch (Exception ex)
+                {
+                    Notify($"A solicitação não retornou dados!{ex.Message}");
+                    return string.Empty;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Notify($"A solicitação não retornou dados!{ex.Message}");
+                Notify($"É necessário informar o Grupo Identificador");
                 return string.Empty;
             }
+            
         }
 
-        private async Task<string> ExportarContasReceberXlsxBase64()
+        private async Task<string> ExportarContasReceberXlsxBase64(string grupoIdentificador)
         {
+            var parametros = await _parametroSistemaService.BuscarParammetroPorGrupoIdentificador(grupoIdentificador);
+            if (parametros == null)
+                return string.Empty;
             // Criar o arquivo Excel em memória
             using (var workbook = new XLWorkbook())
             {
@@ -62,7 +79,7 @@ namespace Zapchat.Service.Services.ContasReceber
 
                 foreach(var codigo in codigosUnicos)
                 {
-                    listaClientes.Add(await _clientesService.ListarDadosClientesPorCod(codigo.ToString()));
+                    listaClientes.Add(await _clientesService.ListarDadosClientesPorCod(codigo.ToString(), grupoIdentificador));
                 }
 
                 var codigosUnicosCategorias = listaAVencer.ContaReceberCadastro
@@ -74,7 +91,7 @@ namespace Zapchat.Service.Services.ContasReceber
 
                 foreach (var codigo in codigosUnicosCategorias)
                 {
-                    listaCategorias.Add(await _categoriaService.ListarDadosCategoriaPorCod(codigo.ToString()));
+                    listaCategorias.Add(await _categoriaService.ListarDadosCategoriaPorCod(codigo.ToString(), grupoIdentificador));
                 }
 
                 List<string> worksheetsNames = new()

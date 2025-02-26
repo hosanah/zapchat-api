@@ -4,6 +4,6 @@ namespace Zapchat.Domain.Interfaces.Clientes
 {
     public interface IClientesService
     {
-        Task<DadosClientesDto> ListarDadosClientesPorCod(string codCliente);
+        Task<DadosClientesDto> ListarDadosClientesPorCod(string codCliente, string grupoIdentificador);
     }
 }

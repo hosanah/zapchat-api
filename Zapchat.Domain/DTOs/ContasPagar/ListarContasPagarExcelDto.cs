@@ -8,6 +8,6 @@ namespace Zapchat.Domain.DTOs.ContasPagar
 {
     public class ListarContasPagarExcelDto
     {
-        public DateTime StartDate { get; set; }
+        public string GrupoIdentificador { get; set; } = string.Empty;
     }
 }

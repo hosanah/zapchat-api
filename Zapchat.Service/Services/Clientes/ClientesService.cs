@@ -19,15 +19,21 @@ namespace Zapchat.Service.Services.Clientes
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
         private readonly IUtilsService _utilsService;
-        public ClientesService(HttpClient httpClient, IUtilsService utilsService, IConfiguration configuration, INotificator notificator) : base(notificator)
+        private readonly IParametroSistemaService _parametroSistemaService;
+        public ClientesService(HttpClient httpClient, IUtilsService utilsService, 
+            IConfiguration configuration, INotificator notificator, 
+            IParametroSistemaService parametroSistemaService) : base(notificator)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _utilsService = utilsService;
+            _parametroSistemaService = parametroSistemaService;
         }
 
-        public async Task<DadosClientesDto> ListarDadosClientesPorCod(string codCliente)
+        public async Task<DadosClientesDto> ListarDadosClientesPorCod(string codCliente, string grupoIdentificador)
         {
+            var parametros = await _parametroSistemaService.BuscarParammetroPorGrupoIdentificador(grupoIdentificador);
+
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];
             if (string.IsNullOrEmpty(baseUri))
                 throw new InvalidOperationException("A URL da API não foi configurada.");
@@ -36,8 +42,8 @@ namespace Zapchat.Service.Services.Clientes
             var request = new
             {
                 call = "ConsultarCliente",
-                app_key = "1490222176443",
-                app_secret = "6f2b10cb4d043172aa2e083613994aef",
+                app_key = $"{parametros.AppKey}",
+                app_secret = $"{parametros.AppSecret}",
                 param = new[]
                 {
                     new

@@ -23,7 +23,7 @@ namespace Zapchat.Api.Controllers
         }
 
 
-        [HttpGet("BuscarTodasConfigurações")]
+        [HttpGet("BuscarTodasConfiguracoes")]
         public async Task<IEnumerable<AutoConfigurarGrupoDto>> ListarTodos() => await _grupoWhatsAppservice.BuscarTodasConfigurações();
 
 

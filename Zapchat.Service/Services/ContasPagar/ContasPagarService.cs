@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using Zapchat.Domain.DTOs.Categoria;
@@ -77,6 +78,11 @@ namespace Zapchat.Service.Services.ContasPagar
                 var listaAVencer = await ListarContasPagarSeteDias(parametros);
                 var listaAtrasado = await ListarContasPagarAtrasados(parametros);
                 var listaVenceHoje = await ListarContasPagarVenceHoje(parametros);
+
+                if(listaAVencer.ContaPagarCadastro.Any())
+                    listaAVencer.ContaPagarCadastro = listaAVencer.ContaPagarCadastro
+                    .Where(c => DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) >= DateTime.Now && DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) <= DateTime.Now.AddDays(7))
+                    .ToList();
 
                 var listaClientes = new List<DadosClientesDto>();
                 var listaCategorias = new List<DadosCategoriaDto>();
@@ -248,9 +254,7 @@ namespace Zapchat.Service.Services.ContasPagar
                         pagina = 1,
                         registros_por_pagina = 999,
                         apenas_importado_api = "N",
-                        filtrar_por_status = "AVENCER",
-                        filtrar_por_data_de = $"{DateTime.Now:dd/MM/yyyy}",
-                        filtrar_por_data_ate = $"{DateTime.Now.AddDays(7):dd/MM/yyyy}",
+                        filtrar_por_status = "AVENCER"
                     }
                 }
             };

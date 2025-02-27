@@ -75,6 +75,11 @@ namespace Zapchat.Service.Services.ContasReceber
                     .Where(c => DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) >= DateTime.Now && DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) <= DateTime.Now.AddDays(7))
                     .ToList();
 
+                if (listaAtrasado.ContaReceberCadastro.Any())
+                    listaAtrasado.ContaReceberCadastro = listaAtrasado.ContaReceberCadastro
+                    .Where(c => DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) >= DateTime.Now.AddDays(-30))
+                    .ToList();
+
                 var codigosUnicos = listaAVencer.ContaReceberCadastro
                                     .Concat(listaAtrasado.ContaReceberCadastro)
                                     .Concat(listaVenceHoje.ContaReceberCadastro)
@@ -166,8 +171,7 @@ namespace Zapchat.Service.Services.ContasReceber
                         pagina = 1,
                         registros_por_pagina = 999,
                         apenas_importado_api = "N",
-                        filtrar_por_status = "ATRASADO",
-                        filtrar_por_data_de = $"{DateTime.Now.AddDays(-30):dd/MM/yyyy}"
+                        filtrar_por_status = "ATRASADO"
                     }
                 }
             };

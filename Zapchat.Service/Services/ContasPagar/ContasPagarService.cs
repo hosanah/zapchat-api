@@ -84,6 +84,11 @@ namespace Zapchat.Service.Services.ContasPagar
                     .Where(c => DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) >= DateTime.Now && DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) <= DateTime.Now.AddDays(7))
                     .ToList();
 
+                if (listaAtrasado.ContaPagarCadastro.Any())
+                    listaAtrasado.ContaPagarCadastro = listaAtrasado.ContaPagarCadastro
+                    .Where(c => DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) >= DateTime.Now.AddDays(-30))
+                    .ToList();
+
                 var listaClientes = new List<DadosClientesDto>();
                 var listaCategorias = new List<DadosCategoriaDto>();
 
@@ -177,8 +182,7 @@ namespace Zapchat.Service.Services.ContasPagar
                         pagina = 1,
                         registros_por_pagina = 999,
                         apenas_importado_api = "N",
-                        filtrar_por_status = "ATRASADO",
-                        filtrar_por_data_de = $"{DateTime.Now.AddDays(-30):dd/MM/yyyy}"
+                        filtrar_por_status = "ATRASADO"
                     }
                 }
             };

@@ -47,5 +47,17 @@ namespace Zapchat.Domain.DTOs.FluxoCaixa
 
         [JsonPropertyName("nValorDocumento")]
         public decimal NValorDocumento { get; set; }
+
+        [JsonPropertyName("cDesCategoria")]
+        public string CDesCategoria { get; set; } = string.Empty;
+
+        [JsonPropertyName("cObservacoes")]
+        public string CObservacoes { get; set; } = string.Empty;
+
+        [JsonPropertyName("cOrigem")]
+        public string COrigem { get; set; } = string.Empty;
+
+        [JsonPropertyName("cSituacao")]
+        public string CSituacao { get; set; } = string.Empty;
     }
 }

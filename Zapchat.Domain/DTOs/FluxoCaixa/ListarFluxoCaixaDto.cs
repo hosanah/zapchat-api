@@ -8,7 +8,6 @@ namespace Zapchat.Domain.DTOs.FluxoCaixa
     /// </summary>
     public class ListarFluxoCaixaDto
     {
-        public DateTime? DataInicio { get; set; }
-        public DateTime? DataFim { get; set; }
+        public string GrupoIdentificador { get; set; } = string.Empty;
     }
 }

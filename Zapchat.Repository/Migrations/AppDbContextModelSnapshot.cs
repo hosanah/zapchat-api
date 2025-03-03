@@ -52,6 +52,9 @@ namespace Zapchat.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Plataforma")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("GruposWhatsApp");

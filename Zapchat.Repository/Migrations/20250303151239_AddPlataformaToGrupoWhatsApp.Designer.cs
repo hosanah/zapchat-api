@@ -11,8 +11,8 @@ using Zapchat.Repository.Data;
 namespace Zapchat.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250214021821_Inicial")]
-    partial class Inicial
+    [Migration("20250303151239_AddPlataformaToGrupoWhatsApp")]
+    partial class AddPlataformaToGrupoWhatsApp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,9 @@ namespace Zapchat.Repository.Migrations
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Plataforma")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

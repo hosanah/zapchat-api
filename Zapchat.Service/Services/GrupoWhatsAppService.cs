@@ -81,7 +81,7 @@ namespace Zapchat.Service.Services
                 }
 
                 // ✅ Criando entidade GrupoWhatsApp
-                var novoGrupo = new GrupoWhatsApp(configDto);
+                var novoGrupo = new GrupoWhatsApp(configDto, TipoPlataforma.Omie);
                 await _repository.AddAsync(novoGrupo);
 
                 // ✅ Criando lista de AdmGrupoWhatsApp
@@ -130,6 +130,7 @@ namespace Zapchat.Service.Services
                     GrupoIdentificador = grupo.Identificador,
                     ApiKey = parametros.AppKey,
                     ApiSecrect = parametros.AppSecret,
+                    Plataforma = grupo.Plataforma,
                     AdmDto = administradores.Select(adm => new AdmDto
                     {
                         NumeroAdm = adm.NumeroAdm

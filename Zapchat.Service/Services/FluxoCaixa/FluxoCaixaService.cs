@@ -91,30 +91,29 @@ namespace Zapchat.Service.Services.FluxoCaixa
                     int row = 2;
 
 
-                    wsResumo.Cell(1, 1).Value = "Data de Lançamento";
-                    wsResumo.Cell(1, 2).Value = "Categoria";
-                    wsResumo.Cell(1, 3).Value = "Descrição";
-                    wsResumo.Cell(1, 4).Value = "Observação";
-                    wsResumo.Cell(1, 5).Value = "Origem";
-                    wsResumo.Cell(1, 6).Value = "Status";
+                    wsResumo.Cell(1, 1).Value = "Situação";
+                    wsResumo.Cell(1, 2).Value = "Data de Lançamento";
+                    wsResumo.Cell(1, 3).Value = "Cliente/Fornecedor";
+                    wsResumo.Cell(1, 4).Value = "Documento";
+                    wsResumo.Cell(1, 5).Value = "Categoria";
+                    wsResumo.Cell(1, 6).Value = "Valor";
                     wsResumo.Cell(1, 7).Value = "Saldo";
-                    wsResumo.Cell(1, 8).Value = "Valor Documento";
 
                     var extrato = await BuscarExtratoDaConta(conta, parametros);
 
                     foreach (var movimento in extrato.ListaMovimentos)
                     {
-
-                        wsResumo.Cell(row, 1).Value = DateTime.ParseExact(movimento.DDataLancamento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                        wsResumo.Cell(row, 2).Value = movimento.CDesCategoria;
-                        wsResumo.Cell(row, 3).Value = RemoverCaracteresInvalidos(movimento.CDesCliente);
-                        wsResumo.Cell(row, 4).Value = RemoverCaracteresInvalidos(movimento.CObservacoes);
-                        wsResumo.Cell(row, 5).Value = movimento.COrigem;
-                        wsResumo.Cell(row, 6).Value = movimento.CSituacao;
+                        wsResumo.Cell(row, 1).Value = movimento.CSituacao;
+                        wsResumo.Cell(row, 1).Style.Fill.BackgroundColor = movimento.CSituacao == "Conciliado" ? XLColor.Green : XLColor.Red;
+                        wsResumo.Cell(row, 2).Value = DateTime.ParseExact(movimento.DDataLancamento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        wsResumo.Cell(row, 3).Value = movimento.CRazCliente;
+                        wsResumo.Cell(row, 4).Value = movimento.CNumero;
+                        wsResumo.Cell(row, 5).Value = movimento.CDesCategoria;
+                        wsResumo.Cell(row, 6).Value = Convert.ToDouble(movimento.NValorDocumento);
+                        wsResumo.Cell(row, 6).Style.Font.FontColor = movimento.NValorDocumento < 0 ? XLColor.Red : XLColor.Blue;
+                        wsResumo.Cell(row, 6).Style.NumberFormat.Format = "#,##0.00";
                         wsResumo.Cell(row, 7).Value = Convert.ToDouble(movimento.NSaldo);
                         wsResumo.Cell(row, 7).Style.NumberFormat.Format = "#,##0.00";
-                        wsResumo.Cell(row, 8).Value = Convert.ToDouble(movimento.NValorDocumento);
-                        wsResumo.Cell(row, 8).Style.NumberFormat.Format = "#,##0.00";
                         row++;
                     }
 
@@ -140,8 +139,7 @@ namespace Zapchat.Service.Services.FluxoCaixa
             
         }
         
-        
-        private async Task<ListarExtratoResponseDto> BuscarExtratoDaConta(ContaCorrenteDto contaCorrente, ParamGrupoWhatsApp param)
+            private async Task<ListarExtratoResponseDto> BuscarExtratoDaConta(ContaCorrenteDto contaCorrente, ParamGrupoWhatsApp param)
         {
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];
             if (string.IsNullOrEmpty(baseUri))

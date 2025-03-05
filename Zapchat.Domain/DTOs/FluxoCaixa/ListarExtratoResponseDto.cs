@@ -59,5 +59,11 @@ namespace Zapchat.Domain.DTOs.FluxoCaixa
 
         [JsonPropertyName("cSituacao")]
         public string CSituacao { get; set; } = string.Empty;
+
+        [JsonPropertyName("cRazCliente")]
+        public string CRazCliente { get; set; } = string.Empty;
+        
+        [JsonPropertyName("cNumero")]
+        public string CNumero { get; set; } = string.Empty;
     }
 }

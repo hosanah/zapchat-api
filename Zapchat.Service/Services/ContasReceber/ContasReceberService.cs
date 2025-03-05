@@ -11,6 +11,7 @@ using Zapchat.Domain.DTOs.Clientes;
 using Zapchat.Domain.Interfaces.Categoria;
 using Zapchat.Service.Services.Categoria;
 using Zapchat.Domain.DTOs.Categoria;
+using Zapchat.Domain.Entities;
 
 namespace Zapchat.Service.Services.ContasReceber
 {
@@ -63,9 +64,9 @@ namespace Zapchat.Service.Services.ContasReceber
             // Criar o arquivo Excel em memória
             using (var workbook = new XLWorkbook())
             {
-                var listaAVencer = await ListarContasReceberSeteDias();
-                var listaAtrasado = await ListarContasReceberAtrasados();
-                var listaVenceHoje = await ListarContasReceberVenceHoje();
+                var listaAVencer = await ListarContasReceberSeteDias(parametros);
+                var listaAtrasado = await ListarContasReceberAtrasados(parametros);
+                var listaVenceHoje = await ListarContasReceberVenceHoje(parametros);
 
                 var listaClientes = new List<DadosClientesDto>();
                 var listaCategorias = new List<DadosCategoriaDto>();
@@ -151,7 +152,7 @@ namespace Zapchat.Service.Services.ContasReceber
             }
         }
 
-        private async Task<ListarContasReceberDto> ListarContasReceberAtrasados()
+        private async Task<ListarContasReceberDto> ListarContasReceberAtrasados(ParamGrupoWhatsApp parametro)
         {
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];
             if (string.IsNullOrEmpty(baseUri))
@@ -162,8 +163,8 @@ namespace Zapchat.Service.Services.ContasReceber
             var request = new
             {
                 call = "ListarContasReceber",
-                app_key = "1490222176443",
-                app_secret = "6f2b10cb4d043172aa2e083613994aef",
+                app_key = $"{parametro.AppKey}",
+                app_secret = $"{parametro.AppSecret}",
                 param = new[]
                 {
                     new
@@ -189,7 +190,7 @@ namespace Zapchat.Service.Services.ContasReceber
             }
         }
 
-        private async Task<ListarContasReceberDto> ListarContasReceberVenceHoje()
+        private async Task<ListarContasReceberDto> ListarContasReceberVenceHoje(ParamGrupoWhatsApp parametro)
         {
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];
             if (string.IsNullOrEmpty(baseUri))
@@ -200,8 +201,8 @@ namespace Zapchat.Service.Services.ContasReceber
             var request = new
             {
                 call = "ListarContasReceber",
-                app_key = "1490222176443",
-                app_secret = "6f2b10cb4d043172aa2e083613994aef",
+                app_key = $"{parametro.AppKey}",
+                app_secret = $"{parametro.AppSecret}",
                 param = new[]
                 {
                     new
@@ -227,7 +228,7 @@ namespace Zapchat.Service.Services.ContasReceber
             }
         }
 
-        private async Task<ListarContasReceberDto> ListarContasReceberSeteDias()
+        private async Task<ListarContasReceberDto> ListarContasReceberSeteDias(ParamGrupoWhatsApp parametro)
         {
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];
             if (string.IsNullOrEmpty(baseUri))
@@ -238,8 +239,8 @@ namespace Zapchat.Service.Services.ContasReceber
             var request = new
             {
                 call = "ListarContasReceber",
-                app_key = "1490222176443",
-                app_secret = "6f2b10cb4d043172aa2e083613994aef",
+                app_key = $"{parametro.AppKey}",
+                app_secret = $"{parametro.AppSecret}",
                 param = new[]
                 {
                     new

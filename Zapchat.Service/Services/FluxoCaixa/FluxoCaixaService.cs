@@ -139,15 +139,15 @@ namespace Zapchat.Service.Services.FluxoCaixa
             
         }
         
-            private async Task<ListarExtratoResponseDto> BuscarExtratoDaConta(ContaCorrenteDto contaCorrente, ParamGrupoWhatsApp param)
+        private async Task<ListarExtratoResponseDto> BuscarExtratoDaConta(ContaCorrenteDto contaCorrente, ParamGrupoWhatsApp param)
         {
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];
             if (string.IsNullOrEmpty(baseUri))
                 throw new InvalidOperationException("A URL da API não foi configurada.");
 
             var hoje = DateTime.Today;
-            var primeiroDiaMesAnterior = new DateTime(hoje.Year, hoje.Month, 1).AddMonths(-1);
-            var ultimoDiaMesAnterior = primeiroDiaMesAnterior.AddMonths(1).AddDays(-1);
+            var dataFinal = hoje.AddDays(-1); 
+            var dataInicial = dataFinal.AddDays(-6); 
 
             var fulluri = baseUri + "financas/extrato/";
             var request = new
@@ -161,8 +161,8 @@ namespace Zapchat.Service.Services.FluxoCaixa
                     {
                         nCodCC = contaCorrente.NCodCC,
                         cCodIntCC = "",
-                        dPeriodoInicial = primeiroDiaMesAnterior.ToString("dd/MM/yyyy"),
-                        dPeriodoFinal = ultimoDiaMesAnterior.ToString("dd/MM/yyyy")
+                        dPeriodoInicial = dataInicial.ToString("dd/MM/yyyy"),
+                        dPeriodoFinal = dataFinal.ToString("dd/MM/yyyy")
                     }
                 }
             };

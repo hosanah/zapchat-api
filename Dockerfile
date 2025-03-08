@@ -11,6 +11,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 
 COPY --from=build /app/out ./
+COPY Zapchat.Api/Images/RioExpLogo.png ./Images/
 
 RUN mkdir -p /app/database
 

@@ -76,56 +76,67 @@ namespace Zapchat.Service.Services.FluxoCaixa
             if (parametros == null)
                 return string.Empty;
 
-
             var listaTodasContas = await ListarContasCorrente(parametros);
 
-            var contator = 0;
             using (var workbook = new XLWorkbook())
             {
-
                 foreach (var conta in listaTodasContas)
                 {
-                    contator++;
                     var nomePaginaPlanilha = RemoverCaracteresInvalidos(conta.Descricao[..Math.Min(31, conta.Descricao.Length)]);
                     var wsResumo = workbook.AddWorksheet(nomePaginaPlanilha);
                     int row = 2;
 
+                    // Cabeçalhos
+                    var headerRange = wsResumo.Range("A1:G1");
+                    headerRange.Style.Fill.BackgroundColor = XLColor.Green;
+                    headerRange.Style.Font.Bold = true;
+                    headerRange.Style.Font.FontColor = XLColor.White;
+                    headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
                     wsResumo.Cell(1, 1).Value = "Situação";
-                    wsResumo.Cell(1, 2).Value = "Data de Lançamento";
-                    wsResumo.Cell(1, 3).Value = "Cliente/Fornecedor";
+                    wsResumo.Cell(1, 2).Value = "Data";
+                    wsResumo.Cell(1, 3).Value = "Cliente ou Fornecedor";
                     wsResumo.Cell(1, 4).Value = "Documento";
                     wsResumo.Cell(1, 5).Value = "Categoria";
                     wsResumo.Cell(1, 6).Value = "Valor";
                     wsResumo.Cell(1, 7).Value = "Saldo";
 
                     var extrato = await BuscarExtratoDaConta(conta, parametros);
+                    var movimentosOrdenados = extrato.ListaMovimentos.OrderBy(m => DateTime.ParseExact(m.DDataLancamento, "dd/MM/yyyy", CultureInfo.InvariantCulture)).ToList();
 
-                    foreach (var movimento in extrato.ListaMovimentos)
+                    foreach (var movimento in movimentosOrdenados)
                     {
+                        bool isSaldo = string.IsNullOrWhiteSpace(movimento.CRazCliente) &&
+                                       string.IsNullOrWhiteSpace(movimento.CNumero) &&
+                                       string.IsNullOrWhiteSpace(movimento.CDesCategoria);
+
                         wsResumo.Cell(row, 1).Value = movimento.CSituacao;
-                        wsResumo.Cell(row, 1).Style.Fill.BackgroundColor = movimento.CSituacao == "Conciliado" ? XLColor.Green : XLColor.Red;
-                        wsResumo.Cell(row, 2).Value = DateTime.ParseExact(movimento.DDataLancamento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                        wsResumo.Cell(row, 3).Value = movimento.CRazCliente;
+                        wsResumo.Cell(row, 1).Style.Fill.BackgroundColor = movimento.CSituacao == "Conciliado" ? XLColor.Green : XLColor.White;
+                        wsResumo.Cell(row, 1).Style.Font.FontColor = XLColor.White;
+                        wsResumo.Cell(row, 2).Value = DateTime.ParseExact(movimento.DDataLancamento, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("dd/MM/yy");
+                        wsResumo.Cell(row, 3).Value = isSaldo ? "SALDO" : movimento.CRazCliente;
                         wsResumo.Cell(row, 4).Value = movimento.CNumero;
                         wsResumo.Cell(row, 5).Value = movimento.CDesCategoria;
-                        wsResumo.Cell(row, 6).Value = Convert.ToDouble(movimento.NValorDocumento);
-                        wsResumo.Cell(row, 6).Style.Font.FontColor = movimento.NValorDocumento < 0 ? XLColor.Red : XLColor.Blue;
+
+                        double valor = Convert.ToDouble(movimento.NValorDocumento);
+                        wsResumo.Cell(row, 6).Value = valor;
+                        wsResumo.Cell(row, 6).Style.Font.FontColor = valor < 0 ? XLColor.Red : XLColor.Blue;
                         wsResumo.Cell(row, 6).Style.NumberFormat.Format = "#,##0.00";
+
                         wsResumo.Cell(row, 7).Value = Convert.ToDouble(movimento.NSaldo);
                         wsResumo.Cell(row, 7).Style.NumberFormat.Format = "#,##0.00";
                         row++;
                     }
 
-                    wsResumo.Cells().Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                    wsResumo.Cells().Style.Border.SetInsideBorder(XLBorderStyleValues.Thin);
-
-                    // Aplicar alinhamento central em todas as células
-                    wsResumo.Cells().Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                    wsResumo.Cells().Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-
-                    // Ajusta todas as colunas automaticamente
+                    // Melhorando layout e removendo caixas
                     wsResumo.Columns().AdjustToContents();
+                    wsResumo.Rows().AdjustToContents();
+                    wsResumo.Rows().Style.Border.TopBorder = XLBorderStyleValues.None;
+                    wsResumo.Rows().Style.Border.BottomBorder = XLBorderStyleValues.None;
+                    wsResumo.Rows().Style.Border.LeftBorder = XLBorderStyleValues.None;
+                    wsResumo.Rows().Style.Border.RightBorder = XLBorderStyleValues.None;
+                    wsResumo.Cells().Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
+                    wsResumo.Cells().Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                 }
 
                 // Retorna o Excel em Base64
@@ -136,9 +147,9 @@ namespace Zapchat.Service.Services.FluxoCaixa
                     return Convert.ToBase64String(byteArray);
                 }
             }
-            
         }
-        
+
+
         private async Task<ListarExtratoResponseDto> BuscarExtratoDaConta(ContaCorrenteDto contaCorrente, ParamGrupoWhatsApp param)
         {
             var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlOmie"];

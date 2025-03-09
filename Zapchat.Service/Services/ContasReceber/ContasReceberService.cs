@@ -107,19 +107,12 @@ namespace Zapchat.Service.Services.ContasReceber
 
                 List<string> worksheetsNames = new()
                 {
-                    "CodigoLancamentoOmie",
-                    "CodigoClienteFornecedor",
-                    "DataEmissao",
+                    "CnpjFornecedor",
+                    "Fornecedor",
                     "DataVencimento",
-                    "DataPrevisao",
-                    "StatusTitulo",
                     "ValorDocumento",
                     "Categoria",
-                    "NumeroDocumento",
-                    "Cliente",
-                    "CnpjCliente",
-                    "ParaTabulacao1",
-                    "ParaTabulacao2"
+                    "StatusTitulo",
                 };
 
                 AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaReceberCadastro, listaClientes, listaCategorias, worksheetsNames);
@@ -139,7 +132,7 @@ namespace Zapchat.Service.Services.ContasReceber
                     "Quantidade 7 dias",
                     "Total 7 dias",
                 };
-                AdicionarPlanilhaSumario(workbook, "Consolidado", worksheetsNamesConsolidado);
+                //AdicionarPlanilhaSumario(workbook, "Consolidado", worksheetsNamesConsolidado);
 
 
                 // Salvar o arquivo em memória
@@ -267,6 +260,7 @@ namespace Zapchat.Service.Services.ContasReceber
         private static void AdicionarPlanilha(XLWorkbook workbook, string nomePlanilha, List<ContasReceberCadastroDto> contas, List<DadosClientesDto> listaClientes, List<DadosCategoriaDto> listaCategorias, List<string> worksheetsNames)
         {
             var worksheet = workbook.AddWorksheet(nomePlanilha);
+            worksheet.Style.Fill.BackgroundColor = XLColor.White;
 
             int worksheetrow = 1;
             foreach (var worksheetsName in worksheetsNames)
@@ -284,33 +278,32 @@ namespace Zapchat.Service.Services.ContasReceber
             int row = 2;
             foreach (var conta in contas)
             {
-                worksheet.Cell(row, 1).Value = DateTime.ParseExact(conta.DataEmissao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 2).Value = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataPrevisao, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 4).Value = conta.StatusTitulo == "ATRASADO" ? conta.StatusTitulo : "RECEBIDO";
-                worksheet.Cell(row, 5).Value = conta.ValorDocumento;
-                worksheet.Cell(row, 5).Style.NumberFormat.Format = "#,##0.00";
-                worksheet.Cell(row, 6).Value = listaCategorias.Where(e => e.Codigo == conta.CodigoCategoria).First().Descricao;
-                worksheet.Cell(row, 7).Value = conta.NumeroParcela;
-                worksheet.Cell(row, 8).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
-                worksheet.Cell(row, 9).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;
-                worksheet.Cell(row, 10).FormulaA1 = $"=F{row}";
-                DateTime dataConvertida = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                worksheet.Cell(row, 11).Value = dataConvertida.Date < DateTime.Today ? "Sim" : "Não";
+                worksheet.Cell(row, 1).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().CnpjCpf;
+                worksheet.Cell(row, 2).Value = listaClientes.Where(e => e.CodClienteOmie == conta.CodigoClienteFornecedor).First().RazaoSocial;
+                worksheet.Cell(row, 3).Value = DateTime.ParseExact(conta.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                worksheet.Cell(row, 4).Value = conta.ValorDocumento;
+                worksheet.Cell(row, 4).Style.NumberFormat.Format = "#,##0.00";
+                worksheet.Cell(row, 5).Value = listaCategorias.Where(e => e.Codigo == conta.CodigoCategoria).First().Descricao;
+                worksheet.Cell(row, 6).Value = conta.StatusTitulo == "ATRASADO" ? conta.StatusTitulo : "RECEBIDO";
 
                 row++;
             }
 
-            // Aplicar bordas externas e internas para toda a planilha
-            worksheet.Cells().Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-            worksheet.Cells().Style.Border.SetInsideBorder(XLBorderStyleValues.Thin);
-
-            // Aplicar alinhamento central em todas as células
-            worksheet.Cells().Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-            worksheet.Cells().Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-
-            // Ajusta todas as colunas automaticamente
+            // Ajustar todas as colunas automaticamente
             worksheet.Columns().AdjustToContents();
+            worksheet.Rows().AdjustToContents();
+
+            // Remover bordas e garantir fundo branco
+            var range = worksheet.RangeUsed();
+            if (range != null)
+            {
+                range.Style.Border.TopBorder = XLBorderStyleValues.None;
+                range.Style.Border.BottomBorder = XLBorderStyleValues.None;
+                range.Style.Border.LeftBorder = XLBorderStyleValues.None;
+                range.Style.Border.RightBorder = XLBorderStyleValues.None;
+            }
+            worksheet.Cells().Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
+            worksheet.Cells().Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
         }
 
         private static void AdicionarPlanilhaSumario(XLWorkbook workbook, string nomePlanilha, List<string> worksheetsNames)

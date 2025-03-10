@@ -86,7 +86,7 @@ namespace Zapchat.Service.Services.ContasPagar
 
                 if (listaAtrasado.ContaPagarCadastro.Any())
                     listaAtrasado.ContaPagarCadastro = listaAtrasado.ContaPagarCadastro
-                    .Where(c => DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) >= DateTime.Now.AddDays(-30))
+                    .Where(c => DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) >= DateTime.Now.AddDays(-180))
                     .ToList();
 
                 var listaClientes = new List<DadosClientesDto>();

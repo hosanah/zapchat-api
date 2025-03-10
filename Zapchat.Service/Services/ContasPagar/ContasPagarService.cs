@@ -128,9 +128,9 @@ namespace Zapchat.Service.Services.ContasPagar
 
 
                 // Adiciona as planilhas
-                AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaPagarCadastro, listaClientes, listaCategorias, worksheetsNames);
-                AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaPagarCadastro, listaClientes, listaCategorias, worksheetsNames);
-                AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaPagarCadastro, listaClientes, listaCategorias, worksheetsNames);
+                AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaPagarCadastro.OrderBy(e => e.DataVencimento).ToList(), listaClientes, listaCategorias, worksheetsNames);
+                AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaPagarCadastro.OrderBy(e => e.DataVencimento).ToList(), listaClientes, listaCategorias, worksheetsNames);
+                AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaPagarCadastro.OrderBy(e => e.DataVencimento).ToList(), listaClientes, listaCategorias, worksheetsNames);
 
                 List<string> worksheetsNamesConsolidado = new()
                 {

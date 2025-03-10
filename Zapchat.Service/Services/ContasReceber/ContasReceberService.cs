@@ -115,9 +115,9 @@ namespace Zapchat.Service.Services.ContasReceber
                     "StatusTitulo",
                 };
 
-                AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaReceberCadastro, listaClientes, listaCategorias, worksheetsNames);
-                AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaReceberCadastro, listaClientes, listaCategorias, worksheetsNames);
-                AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaReceberCadastro, listaClientes, listaCategorias, worksheetsNames);
+                AdicionarPlanilha(workbook, "Vence em 7 dias", listaAVencer.ContaReceberCadastro.OrderBy(e => e.DataVencimento).ToList(), listaClientes, listaCategorias, worksheetsNames);
+                AdicionarPlanilha(workbook, "Lista Atrasado", listaAtrasado.ContaReceberCadastro.OrderBy(e => e.DataVencimento).ToList(), listaClientes, listaCategorias, worksheetsNames);
+                AdicionarPlanilha(workbook, "Vence Hoje", listaVenceHoje.ContaReceberCadastro.OrderBy(e => e.DataVencimento).ToList(), listaClientes, listaCategorias, worksheetsNames);
 
                 List<string> worksheetsNamesConsolidado = new()
                 {

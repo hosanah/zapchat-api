@@ -78,7 +78,7 @@ namespace Zapchat.Service.Services.ContasReceber
 
                 if (listaAtrasado.ContaReceberCadastro.Any())
                     listaAtrasado.ContaReceberCadastro = listaAtrasado.ContaReceberCadastro
-                    .Where(c => DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) >= DateTime.Now.AddDays(-30))
+                    .Where(c => DateTime.ParseExact(c.DataVencimento, "dd/MM/yyyy", CultureInfo.InvariantCulture) >= DateTime.Now.AddDays(-180))
                     .ToList();
 
                 var codigosUnicos = listaAVencer.ContaReceberCadastro

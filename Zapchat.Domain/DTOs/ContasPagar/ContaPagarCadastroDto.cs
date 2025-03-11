@@ -80,7 +80,7 @@ namespace Zapchat.Domain.DTOs.ContasPagar
         public string? RetemPis { get; set; }
 
         [JsonPropertyName("status_titulo")]
-        public string? StatusTitulo { get; set; }
+        public string StatusTitulo { get; set; } = string.Empty;
 
         [JsonPropertyName("valor_documento")]
         public decimal ValorDocumento { get; set; }

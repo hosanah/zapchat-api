@@ -8,9 +8,7 @@ namespace Zapchat.Service.Mappings
     {
         public UsuarioProfile()
         {
-            CreateMap<Usuario, UsuarioDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id)) 
-                .ReverseMap();
+            
         }
     }
 }

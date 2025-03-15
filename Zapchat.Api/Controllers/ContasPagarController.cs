@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Zapchat.Domain.DTOs.ContasPagar;
 using Zapchat.Domain.Interfaces.ContasPagar;
@@ -7,6 +8,7 @@ using Zapchat.Service.Services;
 
 namespace Zapchat.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ContasPagarController : MainController

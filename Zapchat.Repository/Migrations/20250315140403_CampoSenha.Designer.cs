@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Zapchat.Repository.Data;
 
@@ -10,9 +11,11 @@ using Zapchat.Repository.Data;
 namespace Zapchat.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250315140403_CampoSenha")]
+    partial class CampoSenha
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.20");
@@ -88,9 +91,6 @@ namespace Zapchat.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("DataExpiracao")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -102,9 +102,6 @@ namespace Zapchat.Repository.Migrations
                     b.Property<string>("Senha")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("TrocarSenha")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

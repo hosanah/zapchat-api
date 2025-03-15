@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using Zapchat.Domain.Entities;
 using Zapchat.Domain.Interfaces;
 using Zapchat.Repository.Data;
@@ -38,6 +40,11 @@ namespace Zapchat.Repository.Repositories
                 _context.Usuarios.Remove(usuario);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<IEnumerable<Usuario>> Search(Expression<Func<Usuario, bool>> predicate)
+        {
+            return await _context.Usuarios.Where(predicate).ToListAsync();
         }
     }
 }

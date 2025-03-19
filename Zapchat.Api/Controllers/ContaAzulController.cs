@@ -20,10 +20,16 @@ namespace Zapchat.Api.Controllers
             _contaAzulService = contaAzulService;
         }
 
-        [HttpPost]
+        [HttpPost("ListarInadiplentePorEmpresa")]
         public async Task<ActionResult> ListarInadiplentePorEmpresa([FromBody] CapturaInadiplentelDto inadiplentelDto)
         {
             return CustomResponse(await _contaAzulService.ListarInadiplentePorEmpresa(inadiplentelDto));
+        }
+
+        [HttpPost("ListarCliente")]
+        public async Task<ActionResult> ListarCliente([FromBody] CapturaClienteDto inadiplentelDto)
+        {
+            return CustomResponse(await _contaAzulService.ListarCliente(inadiplentelDto));
         }
     }
 }

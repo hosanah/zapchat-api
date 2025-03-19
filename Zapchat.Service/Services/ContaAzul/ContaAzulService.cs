@@ -65,5 +65,46 @@ namespace Zapchat.Service.Services.ContaAzul
                 return null;
             }
         }
+
+        public async Task<ListarClienteDto> ListarCliente(CapturaClienteDto inadiplentelDto)
+        {
+
+            if (string.IsNullOrEmpty(inadiplentelDto.XAuthorization))
+                Notify($"Parâmetro XAuthorization inválido!");
+
+            if (string.IsNullOrEmpty(inadiplentelDto.IdCliente))
+                Notify($"Parâmetro IdCliente inválido!");
+
+            var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlContaAzul"];
+            if (string.IsNullOrEmpty(baseUri))
+                Notify($"A URL da API não foi configurada.!");
+
+
+            var fullUri = baseUri + $"contaazul-bff/person-registration/v1/persons/{inadiplentelDto.IdCliente}/resume";
+
+            var requestBody = new
+            {
+                
+            };
+
+            var headers = new Dictionary<string, string>
+            {
+                { "Host", "services.contaazul.com" },
+                { "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0" },
+                { "Accept", "application/json" },
+                { "X-Authorization", $"{inadiplentelDto.XAuthorization}" }
+            };
+
+            try
+            {
+                return await _utilsService.ExecuteApiCall<object, ListarClienteDto>(HttpMethod.Get, new Uri(fullUri), requestBody, headers);
+
+            }
+            catch (Exception)
+            {
+                Notify($"A solicitação não retornou dados!");
+                return null;
+            }
+        }
     }
 }

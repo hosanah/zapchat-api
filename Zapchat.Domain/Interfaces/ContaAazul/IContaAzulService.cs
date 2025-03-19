@@ -11,5 +11,6 @@ namespace Zapchat.Domain.Interfaces.ContaAazul
     public interface IContaAzulService
     {
         Task<ListarContaAzulDto> ListarInadiplentePorEmpresa(CapturaInadiplentelDto inadiplentelDto);
+        Task<ListarClienteDto> ListarCliente(CapturaClienteDto inadiplentelDto);
     }
 }

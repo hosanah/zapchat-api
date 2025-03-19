@@ -8,6 +8,7 @@ using Zapchat.Domain.Interfaces.Messages;
 
 namespace Zapchat.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ContaAzulController : MainController

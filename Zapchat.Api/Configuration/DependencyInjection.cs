@@ -19,6 +19,8 @@ using Zapchat.Domain.Interfaces.ContasReceber;
 using Zapchat.Service.Services.ContasReceber;
 using Zapchat.Service.Services.Categoria;
 using Zapchat.Domain.Interfaces.Categoria;
+using Zapchat.Domain.Interfaces.ContaAazul;
+using Zapchat.Service.Services.ContaAzul;
 
 namespace Zapchat.Api.Configuration
 {
@@ -43,6 +45,7 @@ namespace Zapchat.Api.Configuration
             services.AddScoped<IParametroSistemaService, ParametroSistemaService>();
             services.AddScoped<IParametroSistemaRepository, ParametroSistemaRepository>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IContaAzulService, ContaAzulService>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();

@@ -8,6 +8,6 @@ namespace Zapchat.Domain.Interfaces
 {
     public interface IUtilsService
     {
-        Task<TResponse> ExecuteApiCall<TRequest, TResponse>(HttpMethod httpMethod, Uri fullUrl, TRequest request);
+        Task<TResponse> ExecuteApiCall<TRequest, TResponse>(HttpMethod httpMethod, Uri fullUrl, TRequest request, Dictionary<string, string>? headers = null);
     }
 }

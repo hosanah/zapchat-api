@@ -15,7 +15,7 @@ namespace Zapchat.Service.Services
             _httpClient = httpClient;
         }
 
-        public async Task<TResponse> ExecuteApiCall<TRequest, TResponse>(HttpMethod httpMethod, Uri fullUrl, TRequest request)
+        public async Task<TResponse> ExecuteApiCall<TRequest, TResponse>(HttpMethod httpMethod, Uri fullUrl, TRequest request, Dictionary<string, string>? headers = null)
         {
             var jsonPayload = JsonSerializer.Serialize(request, new JsonSerializerOptions
             {
@@ -30,12 +30,21 @@ namespace Zapchat.Service.Services
                 Content = content
             };
 
+            // Adiciona os headers personalizados, se existirem
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    httpRequest.Headers.Add(header.Key, header.Value);
+                }
+            }
+
             var response = await _httpClient.SendAsync(httpRequest);
 
             if (!response.IsSuccessStatusCode)
             {
                 var errorResponse = await response.Content.ReadAsStringAsync();
-                Notify($"Erro na API Omie. Código: {response.StatusCode}, Resposta: {errorResponse}");
+                Notify($"Erro na API. Código: {response.StatusCode}, Resposta: {errorResponse}");
                 throw new HttpRequestException($"Erro na requisição: {response.StatusCode}");
             }
 

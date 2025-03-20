@@ -199,10 +199,7 @@ namespace Zapchat.Service.Services
             throw new NotImplementedException();
         }
 
-        public Task<GrupoWhatsAppDto?> GetByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<GrupoWhatsApp> GetByIdAsync(Guid id) => await _repository.GetByIdAsync(id);
 
         public Task<GrupoWhatsApp?> GetByIdentificadorAsync(string identificador)
         {
@@ -249,5 +246,40 @@ namespace Zapchat.Service.Services
 
             return cnpj.EndsWith(digito1.ToString() + digito2.ToString());
         }
+
+        public async Task<AutoConfigurarGrupoDto> GetGrupoPorIdentificador(string identificador)
+        {
+
+
+            var todosGrupos = await BuscarTodasConfigurações();
+
+            var grupoWhats = todosGrupos.Where(e => e.GrupoIdentificador == identificador && e.Plataforma == TipoPlataforma.ContaAzul).FirstOrDefault();
+
+            if(grupoWhats == null)
+            {
+                Notify($"Não foi encontrado nenhum grupo com o parâmetro informado");
+                return null;
+            }
+
+            var administradores = await _admsRepository.GetByGrupoIdAsync(grupoWhats.GrupoGid);
+
+            var parametros = await _paramRepository.GetByGrupoIdAsync(grupoWhats.GrupoGid);
+
+            return new AutoConfigurarGrupoDto
+            {
+                GrupoGid = grupoWhats.GrupoGid,
+                GrupoNome = grupoWhats.GrupoNome,
+                GrupoIdentificador = grupoWhats.GrupoIdentificador,
+                ApiKey = parametros.AppKey,
+                ApiSecrect = parametros.AppSecret,
+                Plataforma = grupoWhats.Plataforma,
+                AdmDto = administradores.Select(adm => new AdmDto
+                {
+                    NumeroAdm = adm.NumeroAdm
+                }).ToList()
+            };
+
+        }
+
     }
 }

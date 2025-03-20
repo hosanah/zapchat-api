@@ -77,11 +77,12 @@ namespace Zapchat.Service.Services
                     {
                         configDto.ApiSecrect = clienteCadastro.RelationId.ToString();
                     }
-
+                    configDto.Plataforma = TipoPlataforma.ContaAzul;
                     novoGrupo = new GrupoWhatsApp(configDto, TipoPlataforma.ContaAzul);
                 } else
                 {
                     novoGrupo = new GrupoWhatsApp(configDto, TipoPlataforma.Omie);
+                    configDto.Plataforma = TipoPlataforma.Omie;
                 }
 
                 if (grupos.Any(e => e.Identificador.Equals(configDto.GrupoIdentificador) && e.Plataforma == novoGrupo.Plataforma))

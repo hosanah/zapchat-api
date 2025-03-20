@@ -7,6 +7,7 @@ using Zapchat.Domain.Entities;
 using Zapchat.Domain.Notifications;
 using Microsoft.Extensions.Configuration;
 using Zapchat.Domain.Interfaces.Messages;
+using System.Text.RegularExpressions;
 
 namespace Zapchat.Service.Services
 {
@@ -60,7 +61,16 @@ namespace Zapchat.Service.Services
             {
                 var validacoes = new List<string>();
                 var grupos = await _repository.GetAllAsync();
-                if (grupos.Any(e => e.Identificador.Equals(configDto.GrupoIdentificador)))
+                var novoGrupo = new GrupoWhatsApp();
+                if (ValidarCNPJ(configDto.ApiKey))
+                {
+                    novoGrupo = new GrupoWhatsApp(configDto, TipoPlataforma.ContaAzul);
+                } else
+                {
+                    novoGrupo = new GrupoWhatsApp(configDto, TipoPlataforma.Omie);
+                }
+
+                if (grupos.Any(e => e.Identificador.Equals(configDto.GrupoIdentificador) && e.Plataforma == novoGrupo.Plataforma))
                     validacoes.Add("Já existe um grupo cadastrado com o mesmo identificados!");
 
                 var parametros = await _paramRepository.GetAllAsync();
@@ -69,6 +79,7 @@ namespace Zapchat.Service.Services
 
                 if (parametros.Any(e => e.AppSecret.Equals(configDto.ApiSecrect)))
                     validacoes.Add("Já existe um ApiSecrect cadastrado com o mesmo identificados!");
+
 
                 if (validacoes.Any())
                 {
@@ -80,8 +91,7 @@ namespace Zapchat.Service.Services
                     return null;
                 }
 
-                // ✅ Criando entidade GrupoWhatsApp
-                var novoGrupo = new GrupoWhatsApp(configDto, TipoPlataforma.Omie);
+                
                 await _repository.AddAsync(novoGrupo);
 
                 // ✅ Criando lista de AdmGrupoWhatsApp
@@ -98,7 +108,16 @@ namespace Zapchat.Service.Services
                 }
 
                 // ✅ Criando lista de ParamGrupoWhatsApp
-                var parametro = new ParamGrupoWhatsApp(configDto.ApiKey, configDto.ApiSecrect);
+                var parametro = new ParamGrupoWhatsApp();
+                if (novoGrupo.Plataforma == TipoPlataforma.ContaAzul)
+                {
+                    parametro = new ParamGrupoWhatsApp(configDto.ApiKey, configDto.ApiSecrect);
+                } 
+                else
+                {
+                    parametro = new ParamGrupoWhatsApp(configDto.ApiKey, configDto.ApiSecrect);
+                }
+                    
                 parametro.GrupoId = novoGrupo.Id;
                 await _paramRepository.AddAsync(parametro);
                 configDto.GrupoGid = novoGrupo.Id;
@@ -178,6 +197,42 @@ namespace Zapchat.Service.Services
         public Task<GrupoWhatsAppDto?> UpdateAsync(Guid id, GrupoWhatsAppDto usuarioDto)
         {
             throw new NotImplementedException();
+        }
+
+        public static bool ValidarCNPJ(string cnpj)
+        {
+            if (string.IsNullOrWhiteSpace(cnpj)) return false;
+
+            // Remove caracteres não numéricos
+            cnpj = Regex.Replace(cnpj, @"\D", "");
+
+            if (cnpj.Length != 14) return false;
+
+            // Verifica se todos os dígitos são iguais (ex: 00000000000000)
+            if (cnpj.Distinct().Count() == 1) return false;
+
+            // Calcula os dois dígitos verificadores
+            int[] multiplicador1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+            int[] multiplicador2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+
+            string tempCnpj = cnpj.Substring(0, 12);
+            int soma = 0;
+
+            for (int i = 0; i < 12; i++)
+                soma += int.Parse(tempCnpj[i].ToString()) * multiplicador1[i];
+
+            int resto = soma % 11;
+            int digito1 = resto < 2 ? 0 : 11 - resto;
+            tempCnpj += digito1;
+            soma = 0;
+
+            for (int i = 0; i < 13; i++)
+                soma += int.Parse(tempCnpj[i].ToString()) * multiplicador2[i];
+
+            resto = soma % 11;
+            int digito2 = resto < 2 ? 0 : 11 - resto;
+
+            return cnpj.EndsWith(digito1.ToString() + digito2.ToString());
         }
     }
 }

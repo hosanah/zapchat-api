@@ -13,13 +13,6 @@ namespace Zapchat.Domain.Entities
         {
             
         }
-        public GrupoWhatsApp(GrupoWhatsAppDto grupoWhatsAppDto, TipoPlataforma plataforma)
-        {
-            Nome = grupoWhatsAppDto.Nome;
-            Identificador = grupoWhatsAppDto.Identificador;
-            Descricao = grupoWhatsAppDto?.Descricao;
-            Plataforma = plataforma;
-        }
 
         public GrupoWhatsApp(AutoConfigurarGrupoDto grupoWhatsAppDto, TipoPlataforma plataforma)
         {

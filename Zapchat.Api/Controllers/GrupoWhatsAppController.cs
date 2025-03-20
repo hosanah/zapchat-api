@@ -3,9 +3,11 @@ using Zapchat.Domain.Interfaces;
 using Zapchat.Domain.DTOs;
 using Zapchat.Domain.Interfaces.Messages;
 using Microsoft.AspNetCore.Authorization;
+using Zapchat.Domain.Interfaces.ContaAazul;
 
 namespace Zapchat.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class GrupoWhatsAppController : MainController

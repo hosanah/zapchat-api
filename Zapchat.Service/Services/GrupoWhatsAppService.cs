@@ -8,6 +8,7 @@ using Zapchat.Domain.Notifications;
 using Microsoft.Extensions.Configuration;
 using Zapchat.Domain.Interfaces.Messages;
 using System.Text.RegularExpressions;
+using Zapchat.Domain.Interfaces.ContaAazul;
 
 namespace Zapchat.Service.Services
 {
@@ -19,8 +20,9 @@ namespace Zapchat.Service.Services
         private readonly IAdmsGrupoRepository _admsRepository;
         private readonly IParametroSistemaRepository _paramRepository;
         private readonly IUtilsService _utilsService;
+        private readonly IContaAzulService _contaAzulService;
 
-        public GrupoWhatsAppService(IGrupoWhatsAppRepository repository, IConfiguration configuration, INotificator notificator, IMapper mapper, IAdmsGrupoRepository admsRepository, IParametroSistemaRepository paramRepository, IUtilsService utilsService) : base(notificator)
+        public GrupoWhatsAppService(IGrupoWhatsAppRepository repository, IConfiguration configuration,IContaAzulService contaAzulService, INotificator notificator, IMapper mapper, IAdmsGrupoRepository admsRepository, IParametroSistemaRepository paramRepository, IUtilsService utilsService) : base(notificator)
         {
             _repository = repository;
             _mapper = mapper;
@@ -28,6 +30,7 @@ namespace Zapchat.Service.Services
             _admsRepository = admsRepository;
             _paramRepository = paramRepository;
             _utilsService = utilsService;
+            _contaAzulService = contaAzulService;
         }
 
         public async Task<GrupoWhatsAppDto> AddAsync(GrupoWhatsAppDto grupoDto)
@@ -64,6 +67,17 @@ namespace Zapchat.Service.Services
                 var novoGrupo = new GrupoWhatsApp();
                 if (ValidarCNPJ(configDto.ApiKey))
                 {
+                    var clientesContaAzul = await _contaAzulService.ListarTodosClientes();
+                    var clienteCadastro = clientesContaAzul.Clientes.Where(e => e.CpfCnpj.Equals(configDto.ApiKey)).FirstOrDefault();
+                    if(clienteCadastro == null)
+                    {
+                        validacoes.Add("Já existe um grupo cadastrado com o mesmo identificados!");
+                    }
+                    else
+                    {
+                        configDto.ApiSecrect = clienteCadastro.RelationId.ToString();
+                    }
+
                     novoGrupo = new GrupoWhatsApp(configDto, TipoPlataforma.ContaAzul);
                 } else
                 {

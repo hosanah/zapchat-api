@@ -106,5 +106,38 @@ namespace Zapchat.Service.Services.ContaAzul
                 return null;
             }
         }
+
+        public async Task<ListarCadastroContaAzulDto> ListarTodosClientes()
+        {
+
+            var baseUri = _configuration.GetSection("BasesUrl")["BaseUrlContaAzul"];
+            if (string.IsNullOrEmpty(baseUri))
+                Notify($"A URL da API não foi configurada.!");
+            var fullUri = $"{baseUri}camais-acc-customers/v1/customers?orderBy=DESCRIPTION&purchaseType=ALL&onlyRenewalScheduleKeysOff=false&pageSize=100&page=0";
+
+            var requestBody = new
+            {
+
+            };
+
+            var headers = new Dictionary<string, string>
+            {
+                { "Host", "services.contaazul.com" },
+                { "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0" },
+                { "Accept", "application/json" },
+                { "Accountancy-Token", "c9053a18-b9e0-447d-af39-5321ad602471" }
+            };
+
+            try
+            {
+                return await _utilsService.ExecuteApiCall<object, ListarCadastroContaAzulDto>(HttpMethod.Get, new Uri(fullUri), requestBody, headers);
+
+            }
+            catch (Exception)
+            {
+                Notify($"A solicitação não retornou dados!");
+                return null;
+            }
+        }
     }
 }

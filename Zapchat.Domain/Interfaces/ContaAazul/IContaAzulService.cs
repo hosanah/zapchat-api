@@ -12,5 +12,6 @@ namespace Zapchat.Domain.Interfaces.ContaAazul
     {
         Task<ListarContaAzulDto> ListarInadiplentePorEmpresa(CapturaInadiplentelDto inadiplentelDto);
         Task<ListarClienteDto> ListarCliente(CapturaClienteDto inadiplentelDto);
+        Task<ListarCadastroContaAzulDto> ListarTodosClientes();
     }
 }
